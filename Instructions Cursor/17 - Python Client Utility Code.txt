@@ -1,0 +1,68 @@
+/**
+ * 16 - Python Client Utility
+ * A secure, server-side bridge for communicating with the FastAPI Math Engine.
+ * This utility handles the 'handshake' using the INTERNAL_SERVICE_KEY.
+ */
+
+const PYTHON_ENGINE_URL = process.env.PYTHON_ENGINE_URL || 'http://localhost:8000';
+const INTERNAL_SERVICE_KEY = process.env.INTERNAL_SERVICE_KEY;
+
+interface PythonEngineResponse<T = any> {
+  status: 'success' | 'error';
+  results?: T;
+  detail?: string;
+  metadata?: {
+    processing_time: string;
+    engine: string;
+    [key: string]: any;
+  };
+}
+
+/**
+ * callPythonEngine
+ * Generic wrapper for POST requests to the FastAPI microservice.
+ * @param endpoint - The FastAPI route (e.g., '/calculate')
+ * @param payload - The data and parameters to process
+ */
+export async function callPythonEngine<T = any>(
+  endpoint: string, 
+  payload: { data: any[]; parameters: Record<string, any> }
+): Promise<PythonEngineResponse<T>> {
+  
+  if (!INTERNAL_SERVICE_KEY) {
+    console.error("CRITICAL: INTERNAL_SERVICE_KEY is missing from environment variables.");
+    throw new Error("Internal Configuration Error");
+  }
+
+  const url = `${PYTHON_ENGINE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-service-key': INTERNAL_SERVICE_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      console.error(`Python Engine Error (${response.status}):`, errorBody.detail || response.statusText);
+      throw new Error(errorBody.detail || `Python Engine returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Log performance in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Python Engine] Success: ${endpoint} (${data.metadata?.processing_time || 'N/A'})`);
+    }
+
+    return data as PythonEngineResponse<T>;
+
+  } catch (error: any) {
+    console.error(`Connection failure to Python Engine at ${url}:`, error.message);
+    throw new Error("Failed to communicate with Math Engine. Please check service status.");
+  }
+}

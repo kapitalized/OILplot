@@ -1,0 +1,66 @@
+/**
+ * 17 - Next.js Analyze Route
+ * Path: /app/api/analyze/route.ts
+ * * Orchestrates the flow from:
+ * 1. Incoming Request (File URL & Params)
+ * 2. Math Processing (FastAPI Engine)
+ * 3. Database Persistence (Supabase)
+ */
+
+import { NextResponse } from 'next/server';
+import { callPythonEngine } from '@/lib/python-client';
+// import { createClient } from '@/lib/supabase/server'; // Uncomment when Supabase is initialized
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { fileUrl, orgId, taskType, parameters } = body;
+
+    // 1. Validation
+    if (!fileUrl || !orgId) {
+      return NextResponse.json(
+        { error: 'Missing required fields: fileUrl and orgId' },
+        { status: 400 }
+      );
+    }
+
+    // 2. Delegate Heavy Math to the Python Engine
+    // We pass the file and parameters to the FastAPI service
+    const pythonResult = await callPythonEngine('/calculate', {
+      data: [{ url: fileUrl, type: taskType }],
+      parameters: parameters || { thickness: 0.2 }
+    });
+
+    if (pythonResult.status === 'error') {
+      throw new Error(pythonResult.detail || 'Python Engine failed to process');
+    }
+
+    /**
+     * 3. Database Persistence (Placeholder)
+     * In a production flow, you would save the results to your 'ai_tasks' table here.
+     * * const supabase = await createClient();
+     * await supabase.from('ai_tasks').update({ 
+     * status: 'REVIEW_REQUIRED', 
+     * results: pythonResult.results 
+     * }).eq('file_url', fileUrl);
+     */
+
+    return NextResponse.json({
+      success: true,
+      message: 'Analysis completed successfully',
+      data: pythonResult.results,
+      metadata: pythonResult.metadata
+    });
+
+  } catch (error: any) {
+    console.error('[Analyze Route Error]:', error.message);
+    
+    return NextResponse.json(
+      { 
+        error: error.message || 'Internal Server Error',
+        suggestion: 'Ensure the Python Engine is running and the INTERNAL_SERVICE_KEY matches.'
+      },
+      { status: 500 }
+    );
+  }
+}

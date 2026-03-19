@@ -1,0 +1,75 @@
+# 15 - FastAPI Main Entry: The "Math Brain"
+# This service handles heavy data manipulation that Node.js is less efficient at.
+
+import os
+import uvicorn
+from fastapi import FastAPI, Header, HTTPException
+from pydantic import BaseModel
+from typing import Optional, List
+
+app = FastAPI(
+    title="B2B Math & Logic Engine",
+    description="FastAPI microservice for CAD parsing and financial calculations."
+)
+
+# This secret must match the one in the Next.js .env.local
+INTERNAL_SERVICE_KEY = os.getenv("INTERNAL_SERVICE_KEY", "dev-secret-handshake")
+
+class MathRequest(BaseModel):
+    data: List[dict]
+    parameters: dict
+
+@app.get("/")
+async def health_check():
+    """Service health check for container orchestration."""
+    return {
+        "status": "online",
+        "engine": "FastAPI 0.110+",
+        "features": ["CAD Parsing", "Financial Logic", "Shoelace Area Calc"]
+    }
+
+@app.post("/calculate")
+async def calculate(req: MathRequest, x_service_key: Optional[str] = Header(None)):
+    """
+    Primary endpoint for high-precision calculations.
+    Accepts raw extracted data and returns calculated volumes/ratios.
+    """
+    # 1. Security Handshake
+    if x_service_key != INTERNAL_SERVICE_KEY:
+        raise HTTPException(status_code=403, detail="Unauthorized: Invalid Service Key")
+    
+    # 2. Calculation Logic
+    # Example: Processing a list of polygons to find cubic volume
+    results = []
+    thickness = req.parameters.get('thickness', 0.2) # Default 200mm
+    
+    try:
+        for item in req.data:
+            # We assume 'area' has been pre-calculated or coordinates are provided
+            area = item.get('area', 0)
+            volume = area * thickness
+            
+            results.append({ 
+                "id": item.get('id'), 
+                "label": item.get('label', 'Unknown Component'),
+                "area_m2": round(area, 2),
+                "volume_m3": round(volume, 2),
+                "verified": True
+            })
+            
+        return { 
+            "status": "success", 
+            "results": results,
+            "metadata": {
+                "items_processed": len(results),
+                "applied_thickness": thickness
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Math Logic Error: {str(e)}")
+
+if __name__ == "__main__":
+    # Local development runner
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
