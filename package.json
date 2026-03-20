@@ -40,7 +40,8 @@
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "sharp": "^0.33.0",
-    "stripe": "^20.4.1"
+    "stripe": "^20.4.1",
+    "yahoo-finance2": "^3.13.2"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

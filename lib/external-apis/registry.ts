@@ -1,8 +1,10 @@
 import type { IExternalApiAdapter } from './types';
 import { genericAdapter } from './adapters/generic';
+import { yahooPricesAdapter } from './adapters/yahoo-prices';
 
 const adapters = new Map<string, IExternalApiAdapter>([
   [genericAdapter.key, genericAdapter],
+  [yahooPricesAdapter.key, yahooPricesAdapter],
 ]);
 
 /** Register an adapter. Call from adapters/* and import in a central init if needed. */
