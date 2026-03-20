@@ -1,30 +1,30 @@
 import { BRAND } from '@/lib/brand';
+import { getPageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Features',
-  description: `Explore ${BRAND.name} features: floorplan analysis, room detection, and materials estimation for construction.`,
-};
+export async function generateMetadata() {
+  return getPageMetadata('features');
+}
 
 const features = [
   {
-    title: 'Floorplan upload & parsing',
-    description: 'Upload PDF or image floorplans. We detect walls, rooms, and dimensions so you get structured area data without manual tracing.',
+    title: 'Search data sources',
+    description: 'Discover where the data comes from (APIs + later scrapers) and track ingestion runs for transparency.',
   },
   {
-    title: 'Room & area detection',
-    description: 'Automatic room labeling and square footage per space. Support for multi-level plans and common construction units (sq ft, sq m).',
+    title: 'Oil visualisations',
+    description: 'Interactive charts for prices, shipments, and production—so you can see patterns, spreads, and flows quickly.',
   },
   {
-    title: 'Materials estimation & takeoffs',
-    description: 'Generate material quantities from your plans: flooring, paint, trim, drywall, and more. Adjust waste factors and unit costs.',
+    title: 'Run your own analysis',
+    description: 'Use AI to query the repository and summarize results with evidence, then iterate with your own assumptions.',
   },
   {
-    title: 'Export & reporting',
-    description: 'Export takeoffs and estimates to CSV or Excel. Share reports with your team or clients and keep everything in one place.',
+    title: 'Visual story cards',
+    description: 'Turn dataset queries into shareable cards that combine a narrative with the underlying chart configuration.',
   },
   {
-    title: 'Secure & organized',
-    description: 'Project-based storage, org-scoped data, and encrypted uploads. Built for contractors and estimators who need reliability.',
+    title: 'Secure & organized workspaces',
+    description: 'Keep chats, visualisations, and evidence scoped to your workspace—so your analysis stays auditable.',
   },
 ];
 
@@ -33,7 +33,7 @@ export default function FeaturesPage() {
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="text-3xl font-bold tracking-tight">Features</h1>
       <p className="mt-2 text-muted-foreground">
-        Everything you need for floorplan and materials estimation — built for construction.
+        Everything you need to explore large oil datasets with transparent ingestion, evidence-driven analysis, and interactive visuals.
       </p>
       <ul className="mt-12 space-y-10">
         {features.map((f) => (

@@ -8,6 +8,7 @@ import {
   pgSchema,
   uuid,
   text,
+  date,
   timestamp,
   integer,
   jsonb,
@@ -422,6 +423,106 @@ export const ref_knowledge_nodes = pgTable('ref_knowledge_nodes', {
   source_standard_id: uuid('source_standard_id').references(() => ref_standards.id),
   metadata: jsonb('metadata'),
   created_at: timestamp('created_at').defaultNow(),
+});
+
+// ---- MODULE 7: OIL DATA REPOSITORY (oil src_/dim_/fact_) ----
+// These tables power Oilplot's ingestion + visualizations (Refinery Explorer, Reserves Map, Spot Price Terminal, etc.).
+export const dim_countries = pgTable('dim_countries', {
+  iso_code: text('iso_code').primaryKey(),
+  country_name: text('country_name').notNull(),
+  region: text('region'),
+});
+
+export const dim_oil_types = pgTable('dim_oil_types', {
+  id: integer('id').primaryKey(),
+  code: text('code').notNull(),
+  name: text('name').notNull(),
+});
+
+export const dim_oil_types_app = pgTable('dim_oil_types_app', {
+  id: integer('id').primaryKey(),
+  code: text('code').notNull(),
+  name: text('name').notNull(),
+});
+
+export const dim_refineries = pgTable('dim_refineries', {
+  ref_id: integer('ref_id').primaryKey(),
+  name: text('name').notNull(),
+  country_code: text('country_code').references(() => dim_countries.iso_code),
+  capacity_kbd: integer('capacity_kbd'),
+  operator: text('operator'),
+  type: text('type').notNull().default('Refinery'),
+  gps_lat: decimal('gps_lat'),
+  gps_long: decimal('gps_long'),
+});
+
+export const dim_wells = pgTable('dim_wells', {
+  well_id: integer('well_id').primaryKey(),
+  well_name: text('well_name').notNull(),
+  field_name: text('field_name'),
+  country_code: text('country_code').references(() => dim_countries.iso_code),
+  well_size_category: text('well_size_category'),
+  discovery_date: date('discovery_date'),
+  gps_lat: decimal('gps_lat'),
+  gps_long: decimal('gps_long'),
+});
+
+export const fact_prices = pgTable('fact_prices', {
+  price_id: integer('price_id').primaryKey(),
+  oil_type_id: integer('oil_type_id').references(() => dim_oil_types.id),
+  price_usd_per_bbl: decimal('price_usd_per_bbl'),
+  market_location: text('market_location'),
+  price_date: date('price_date').notNull(),
+});
+
+export const fact_prices_app = pgTable('fact_prices_app', {
+  id: integer('id').primaryKey(),
+  oil_type_id: integer('oil_type_id').notNull().references(() => dim_oil_types_app.id),
+  price_date: date('price_date').notNull(),
+  close_price: decimal('close_price').notNull(),
+  change_percent: decimal('change_percent'),
+  src: text('src').notNull(),
+  created_at: timestamp('created_at').defaultNow(),
+});
+
+export const fact_production = pgTable('fact_production', {
+  prod_id: integer('prod_id').primaryKey(),
+  country_code: text('country_code').references(() => dim_countries.iso_code),
+  ref_id: integer('ref_id').references(() => dim_refineries.ref_id),
+  oil_type_id: integer('oil_type_id').references(() => dim_oil_types.id),
+  volume_barrels: integer('volume_barrels'),
+  report_date: date('report_date').notNull(),
+  is_forecast: boolean('is_forecast').default(false),
+  src_id: integer('src_id'),
+});
+
+export const fact_shipments = pgTable('fact_shipments', {
+  shipment_id: integer('shipment_id').primaryKey(),
+  origin_country: text('origin_country').references(() => dim_countries.iso_code),
+  dest_refinery_id: integer('dest_refinery_id').references(() => dim_refineries.ref_id),
+  oil_type_id: integer('oil_type_id').references(() => dim_oil_types.id),
+  volume_barrels: integer('volume_barrels'),
+  arrival_date: date('arrival_date'),
+  route_name: text('route_name'),
+  status: text('status').default('Completed'),
+});
+
+export const fact_well_output = pgTable('fact_well_output', {
+  output_id: integer('output_id').primaryKey(),
+  well_id: integer('well_id').references(() => dim_wells.well_id),
+  daily_barrels: integer('daily_barrels'),
+  water_cut_pct: decimal('water_cut_pct'),
+  report_date: date('report_date').notNull(),
+});
+
+export const src_scraper_logs = pgTable('src_scraper_logs', {
+  log_id: integer('log_id').primaryKey(),
+  scraper_name: text('scraper_name').notNull(),
+  run_time: timestamp('run_time').defaultNow(),
+  rows_inserted: integer('rows_inserted'),
+  status: text('status'),
+  error_message: text('error_message'),
+  raw_response_json: jsonb('raw_response_json'),
 });
 
 // ---- APP SETTINGS (admin-configurable, single row) ----

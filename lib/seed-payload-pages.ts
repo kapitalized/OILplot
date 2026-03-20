@@ -11,7 +11,7 @@ export const DEFAULT_PAGES = [
   {
     slug: 'features',
     title: 'Features',
-    metaDescription: `Explore ${BRAND.name} features: floorplan analysis, materials estimation, and construction workflows.`,
+    metaDescription: `Explore ${BRAND.name} features: oil data sources, visualisations, and run-your-own analysis.`,
   },
   {
     slug: 'pricing',

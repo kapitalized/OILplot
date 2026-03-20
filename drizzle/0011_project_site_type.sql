@@ -1,1 +1,1 @@
-ALTER TABLE "project_main" ADD COLUMN "site_type" text;
+ALTER TABLE "project_main" ADD COLUMN IF NOT EXISTS "site_type" text;

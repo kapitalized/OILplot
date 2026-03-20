@@ -1,16 +1,17 @@
 import Link from 'next/link';
-import { BRAND } from '@/lib/brand';
+import { getAppName } from '@/lib/app-name';
+import { getPageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: `Terms of Use | ${BRAND.name}`,
-  description: `Terms of service for using ${BRAND.name} — acceptable use and legal terms.`,
-};
+export async function generateMetadata() {
+  return getPageMetadata('terms');
+}
 
-const sections = [
+function buildSections(appName: string) {
+  return [
   {
     id: 'acceptance',
     title: 'Acceptance of Terms',
-    content: `By creating an account or using the ${BRAND.name} platform, you agree to be bound by these Terms of Use and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.`,
+    content: `By creating an account or using the ${appName} platform, you agree to be bound by these Terms of Use and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.`,
   },
   {
     id: 'accounts',
@@ -35,7 +36,7 @@ const sections = [
         <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4">
           <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">Important Notice on Accuracy:</p>
           <p className="text-sm text-amber-800 dark:text-amber-300 mt-1">
-            AI-generated content can contain inaccuracies, errors, or &quot;hallucinations.&quot; You the User acknowledge that {BRAND.name} does not guarantee the accuracy, completeness, or reliability of any output. <strong>It is your sole responsibility to check, verify, and validate all AI-generated results</strong> before relying on them for business, legal, or professional purposes.
+            AI-generated content can contain inaccuracies, errors, or &quot;hallucinations.&quot; You the User acknowledge that {appName} does not guarantee the accuracy, completeness, or reliability of any output. <strong>It is your sole responsibility to check, verify, and validate all AI-generated results</strong> before relying on them for business, legal, or professional purposes.
           </p>
         </div>
       </>
@@ -49,7 +50,7 @@ const sections = [
         We strive to provide continuous access to the platform; however:
         <ul className="mt-2 list-disc pl-6 space-y-1">
           <li><strong>Hosting Dependencies:</strong> The platform relies on third-party infrastructure and hosting providers (e.g., AWS, Google Cloud, or Azure).</li>
-          <li><strong>No Uptime Guarantee:</strong> {BRAND.name} does not guarantee 100% uptime. Service may be interrupted by maintenance, server failures, or outages caused by our hosting providers or global internet infrastructure.</li>
+          <li><strong>No Uptime Guarantee:</strong> {appName} does not guarantee 100% uptime. Service may be interrupted by maintenance, server failures, or outages caused by our hosting providers or global internet infrastructure.</li>
           <li><strong>Limitation:</strong> We are not liable for any losses, data corruption, or business interruptions resulting from such third-party outages or technical failures beyond our direct control.</li>
         </ul>
       </>
@@ -77,17 +78,21 @@ const sections = [
   {
     id: 'liability',
     title: 'Limitation of Liability',
-    content: `The platform is provided "as is." In no event shall ${BRAND.name} or its suppliers be liable for any damages (including loss of data or profit) arising out of the use or inability to use the platform, even if ${BRAND.name} has been notified of the possibility of such damage.`,
+    content: `The platform is provided "as is." In no event shall ${appName} or its suppliers be liable for any damages (including loss of data or profit) arising out of the use or inability to use the platform, even if ${appName} has been notified of the possibility of such damage.`,
   },
-];
+  ];
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const appName = await getAppName();
+  const sections = buildSections(appName);
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <header className="border-b pb-8 mb-10">
         <h1 className="text-3xl font-bold tracking-tight">Terms of Use</h1>
         <p className="mt-4 text-muted-foreground">
-          This agreement is between <strong>{BRAND.name}</strong> and <strong>you the User</strong>. By accessing this platform, you agree to comply with these terms. Please also review our{' '}
+          This agreement is between <strong>{appName}</strong> and <strong>you the User</strong>. By accessing this platform, you agree to comply with these terms. Please also review our{' '}
           <Link href="/privacy" className="text-primary underline hover:no-underline">Privacy Policy</Link>.
         </p>
       </header>

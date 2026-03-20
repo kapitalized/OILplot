@@ -1,16 +1,17 @@
 import Link from 'next/link';
-import { BRAND } from '@/lib/brand';
+import { getAppName } from '@/lib/app-name';
+import { getPageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: `Privacy Policy | ${BRAND.name}`,
-  description: `Privacy policy for ${BRAND.name} — how we collect, use, and protect your data.`,
-};
+export async function generateMetadata() {
+  return getPageMetadata('privacy');
+}
 
-const sections = [
+function buildSections(appName: string) {
+  return [
   {
     id: 'intro',
     title: 'Introduction',
-    content: `Welcome to ${BRAND.name}. We are committed to protecting your data and privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our platform. By accessing the platform, you agree to these terms.`,
+    content: `Welcome to ${appName}. We are committed to protecting your data and privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our platform. By accessing the platform, you agree to these terms.`,
   },
   {
     id: 'data-collection',
@@ -70,14 +71,18 @@ const sections = [
     content: 'You have the right to access, export, or request the deletion of your account and any associated documents. Please contact us via the link below if you wish to exercise these rights.',
   },
 ];
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const appName = await getAppName();
+  const sections = buildSections(appName);
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <header className="border-b pb-8 mb-10">
         <h1 className="text-3xl font-bold tracking-tight">Privacy Policy</h1>
         <p className="mt-4 text-muted-foreground">
-          This Privacy Policy describes the agreement between <strong>{BRAND.name}</strong> and <strong>you the User</strong> regarding the collection and use of data on this platform. This policy should be read in conjunction with our{' '}
+          This Privacy Policy describes the agreement between <strong>{appName}</strong> and <strong>you the User</strong> regarding the collection and use of data on this platform. This policy should be read in conjunction with our{' '}
           <Link href="/terms" className="text-primary underline hover:no-underline">Terms of Use</Link>.
         </p>
       </header>

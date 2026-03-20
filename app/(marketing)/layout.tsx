@@ -1,13 +1,15 @@
 import Link from 'next/link';
 import { BRAND } from '@/lib/brand';
 import { getB2BSoftwareJsonLd } from '@/lib/seo';
+import { getAppName } from '@/lib/app-name';
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const jsonLd = getB2BSoftwareJsonLd();
+  const appName = await getAppName();
+  const jsonLd = getB2BSoftwareJsonLd(appName);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -17,7 +19,7 @@ export default function MarketingLayout({
       />
       <header className="border-b px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center" style={{ color: BRAND.colors.primary }}>
-          <img src={BRAND.logo} alt={BRAND.name} className="h-8 w-auto" />
+          <img src={BRAND.logo} alt={appName} className="h-8 w-auto" />
         </Link>
         <nav className="flex items-center gap-6">
           <Link href="/" className="text-base text-muted-foreground hover:text-foreground">
@@ -63,7 +65,7 @@ export default function MarketingLayout({
       <footer className="border-t px-6 py-8">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-4">
           <span className="text-base text-muted-foreground">
-            © {new Date().getFullYear()} {BRAND.name}. {BRAND.slogan}
+            © {new Date().getFullYear()} {appName}. {BRAND.slogan}
           </span>
           <nav className="flex gap-6 text-base text-muted-foreground">
             <Link href="/about" className="hover:text-foreground">About</Link>

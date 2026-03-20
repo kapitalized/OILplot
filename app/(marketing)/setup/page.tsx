@@ -1,11 +1,12 @@
-import { BRAND } from '@/lib/brand';
 import type { Metadata } from 'next';
+import { getPageMetadata } from '@/lib/seo';
+import { getAppName } from '@/lib/app-name';
 
-export const metadata: Metadata = {
-  title: 'External Services Setup',
-  description: `Configure external services for ${BRAND.name}. Neon, Neon Auth, Vercel Blob, Drizzle, and more.`,
-  robots: 'noindex, nofollow',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  // Mark as non-indexable in line with the previous static metadata.
+  const meta = await getPageMetadata('setup');
+  return { ...meta, robots: 'noindex, nofollow' };
+}
 
 /** Manual steps you must do in external dashboards. Shown as clear cards. */
 const manualSettingCards = [
@@ -229,12 +230,13 @@ const services = [
   },
 ];
 
-export default function SetupPage() {
+export default async function SetupPage() {
+  const appName = await getAppName();
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
       <h1 className="text-3xl font-bold tracking-tight">External Services Setup</h1>
       <p className="mt-2 text-muted-foreground">
-        Base stack for {BRAND.name}: <strong>Neon + Neon Auth + Vercel Blob + Drizzle</strong>. Copy <code className="rounded bg-muted px-1.5 py-0.5 text-sm">.env.example</code> to <code className="rounded bg-muted px-1.5 py-0.5 text-sm">.env.local</code> and complete the manual steps below.
+        Base stack for {appName}: <strong>Neon + Neon Auth + Vercel Blob + Drizzle</strong>. Copy <code className="rounded bg-muted px-1.5 py-0.5 text-sm">.env.example</code> to <code className="rounded bg-muted px-1.5 py-0.5 text-sm">.env.local</code> and complete the manual steps below.
       </p>
 
       <section className="mt-10 rounded-xl border-2 border-amber-500/30 bg-amber-500/5 p-6">

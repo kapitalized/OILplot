@@ -57,13 +57,13 @@ export default function DashboardPage() {
           router.replace('/login?next=/dashboard&reason=session');
           return;
         }
-        setError('Failed to load projects.');
+        setError('Failed to load workspaces.');
         return;
       }
       const data = await res.json();
       setProjects(Array.isArray(data) ? data : []);
     } catch {
-      setError('Failed to load projects.');
+      setError('Failed to load workspaces.');
     } finally {
       setLoading(false);
     }
@@ -120,13 +120,13 @@ export default function DashboardPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError((data as { error?: string }).error ?? 'Failed to update project.');
+        setError((data as { error?: string }).error ?? 'Failed to update workspace.');
         return;
       }
       setEditProjectId(null);
       await load();
     } catch {
-      setError('Failed to update project.');
+      setError('Failed to update workspace.');
     } finally {
       setSavingEdit(false);
     }
@@ -152,7 +152,7 @@ export default function DashboardPage() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError((data as { error?: string }).error ?? 'Failed to create project.');
+        setError((data as { error?: string }).error ?? 'Failed to create workspace.');
         return;
       }
       setNewName('');
@@ -162,7 +162,7 @@ export default function DashboardPage() {
       setNewNumberOfLevels(1);
       await load();
     } catch {
-      setError('Failed to create project.');
+      setError('Failed to create workspace.');
     } finally {
       setCreating(false);
     }
@@ -172,7 +172,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">Manage projects and run AI analysis.</p>
+        <p className="mt-2 text-muted-foreground">Explore oil datasets, visualise insights, and run your own analysis.</p>
       </div>
 
       {error && (
@@ -182,13 +182,13 @@ export default function DashboardPage() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr,400px]">
-        {/* Left: Projects list */}
+        {/* Left: Workspaces list */}
         <section className="min-w-0">
-          <h2 className="font-semibold text-lg mb-2">Projects</h2>
+          <h2 className="font-semibold text-lg mb-2">Workspaces</h2>
           {loading ? (
             <p className="text-muted-foreground text-sm">Loading…</p>
           ) : projects.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No projects yet. Create one in the form on the right.</p>
+            <p className="text-muted-foreground text-sm">No workspaces yet. Create one in the form on the right.</p>
           ) : (
             <ul className="space-y-2">
               {projects.map((p) => {
@@ -241,9 +241,9 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {/* Right: Create new project */}
+        {/* Right: Create new workspace */}
         <section className="lg:max-w-[400px]">
-          <h2 className="font-semibold text-lg mb-2">New project</h2>
+          <h2 className="font-semibold text-lg mb-2">New workspace</h2>
           <form onSubmit={createProject} className="space-y-3">
             <label className="flex flex-col gap-1">
               <span className="text-sm text-muted-foreground">Name</span>
@@ -251,13 +251,13 @@ export default function DashboardPage() {
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder="Project name"
+                placeholder="Workspace name"
                 className="rounded-md border border-input bg-background px-3 py-2 w-full text-foreground placeholder:text-muted-foreground"
               />
             </label>
             <div className="flex flex-col gap-1">
               <span className="text-sm text-muted-foreground">Address (optional)</span>
-              <AddressForm value={newAddress} onChange={setNewAddress} labelPrefix="Project" compact />
+              <AddressForm value={newAddress} onChange={setNewAddress} labelPrefix="Workspace" compact />
             </div>
             <label className="flex flex-col gap-1">
               <span className="text-sm text-muted-foreground">Description (optional)</span>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
               </select>
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-sm text-muted-foreground">Status of project</span>
+              <span className="text-sm text-muted-foreground">Status of workspace</span>
               <select
                 value={newProjectStatus}
                 onChange={(e) => setNewProjectStatus(e.target.value)}
@@ -299,7 +299,7 @@ export default function DashboardPage() {
               disabled={creating || !newName.trim()}
               className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50 w-full"
             >
-              {creating ? 'Creating…' : 'Create project'}
+              {creating ? 'Creating…' : 'Create workspace'}
             </button>
           </form>
         </section>
@@ -308,7 +308,7 @@ export default function DashboardPage() {
       {editProjectId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true">
           <div className="bg-background border rounded-lg shadow-lg p-4 max-w-lg w-full mx-2 max-h-[90vh] overflow-y-auto">
-            <h3 className="font-semibold text-lg mb-3">Edit project</h3>
+            <h3 className="font-semibold text-lg mb-3">Edit workspace</h3>
             <div className="space-y-3">
               <label className="flex flex-col gap-1">
                 <span className="text-sm text-muted-foreground">Name</span>
@@ -321,7 +321,7 @@ export default function DashboardPage() {
               </label>
               <div className="flex flex-col gap-1">
                 <span className="text-sm text-muted-foreground">Address</span>
-                <AddressForm value={editAddress} onChange={setEditAddress} labelPrefix="Project" compact />
+                <AddressForm value={editAddress} onChange={setEditAddress} labelPrefix="Workspace" compact />
               </div>
               <label className="flex flex-col gap-1">
                 <span className="text-sm text-muted-foreground">Description</span>
@@ -346,7 +346,7 @@ export default function DashboardPage() {
                 </select>
               </label>
               <label className="flex flex-col gap-1">
-                <span className="text-sm text-muted-foreground">Status of project</span>
+                <span className="text-sm text-muted-foreground">Status of workspace</span>
                 <select
                   value={editProjectStatus}
                   onChange={(e) => setEditProjectStatus(e.target.value)}

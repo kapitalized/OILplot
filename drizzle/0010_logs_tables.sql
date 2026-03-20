@@ -35,16 +35,16 @@ CREATE TABLE IF NOT EXISTS "logs_reports" (
 	"file_ids" jsonb
 );
 --> statement-breakpoint
-ALTER TABLE "ai_analyses" ADD COLUMN "run_started_at" timestamp;--> statement-breakpoint
-ALTER TABLE "ai_analyses" ADD COLUMN "run_duration_ms" integer;--> statement-breakpoint
-ALTER TABLE "ai_analyses" ADD COLUMN "input_size_bytes" integer;--> statement-breakpoint
-ALTER TABLE "ai_analyses" ADD COLUMN "input_page_count" integer;--> statement-breakpoint
-ALTER TABLE "ai_analyses" ADD COLUMN "token_usage" jsonb;--> statement-breakpoint
-ALTER TABLE "ai_analyses" ADD COLUMN "models_used" jsonb;--> statement-breakpoint
-ALTER TABLE "ai_analyses" ADD COLUMN "step_trace" jsonb;--> statement-breakpoint
-ALTER TABLE "project_main" ADD COLUMN "project_objectives" text;--> statement-breakpoint
-ALTER TABLE "project_main" ADD COLUMN "country" text;--> statement-breakpoint
-ALTER TABLE "project_main" ADD COLUMN "project_status" text;--> statement-breakpoint
+ALTER TABLE "ai_analyses" ADD COLUMN IF NOT EXISTS "run_started_at" timestamp;--> statement-breakpoint
+ALTER TABLE "ai_analyses" ADD COLUMN IF NOT EXISTS "run_duration_ms" integer;--> statement-breakpoint
+ALTER TABLE "ai_analyses" ADD COLUMN IF NOT EXISTS "input_size_bytes" integer;--> statement-breakpoint
+ALTER TABLE "ai_analyses" ADD COLUMN IF NOT EXISTS "input_page_count" integer;--> statement-breakpoint
+ALTER TABLE "ai_analyses" ADD COLUMN IF NOT EXISTS "token_usage" jsonb;--> statement-breakpoint
+ALTER TABLE "ai_analyses" ADD COLUMN IF NOT EXISTS "models_used" jsonb;--> statement-breakpoint
+ALTER TABLE "ai_analyses" ADD COLUMN IF NOT EXISTS "step_trace" jsonb;--> statement-breakpoint
+ALTER TABLE "project_main" ADD COLUMN IF NOT EXISTS "project_objectives" text;--> statement-breakpoint
+ALTER TABLE "project_main" ADD COLUMN IF NOT EXISTS "country" text;--> statement-breakpoint
+ALTER TABLE "project_main" ADD COLUMN IF NOT EXISTS "project_status" text;--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "logs_ai_runs" ADD CONSTRAINT "logs_ai_runs_project_id_project_main_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."project_main"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION

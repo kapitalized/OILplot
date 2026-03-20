@@ -1,22 +1,23 @@
 import Link from 'next/link';
 import { BRAND } from '@/lib/brand';
+import { getAppName } from '@/lib/app-name';
+import { getPageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'About',
-  description: `Learn about ${BRAND.name} — ${BRAND.slogan}.`,
-};
+export async function generateMetadata() {
+  return getPageMetadata('about');
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const appName = await getAppName();
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="text-3xl font-bold tracking-tight">About {BRAND.name}</h1>
+      <h1 className="text-3xl font-bold tracking-tight">About {appName}</h1>
       <p className="mt-4 text-muted-foreground leading-relaxed">
-        We build precision AI tools for technical industries: construction takeoffs, financial analysis,
-        and document intelligence. Every output is designed for human review and audit trails.
+        Oilplot.com is an open energy repository: we turn fragmented oil data into actionable, AI-analyzed insights.
+        Every output is designed for human review and auditable evidence.
       </p>
       <p className="mt-4 text-muted-foreground leading-relaxed">
-        Our stack combines vision models for extraction, reasoning models for calculation, and
-        synthesis for professional reporting — so your team stays in control.
+        Our platform focuses on large datasets and transparent ingestion, so you can explore oil visualisations and run your own analysis.
       </p>
       <Link
         href="/contact"

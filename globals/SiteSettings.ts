@@ -7,8 +7,18 @@ export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Site Settings',
   fields: [
-    { name: 'siteTitle', type: 'text', required: true, defaultValue: 'ConstructAI' },
-    { name: 'titleTemplate', type: 'text', defaultValue: '%s | ConstructAI', admin: { description: 'e.g. %s | ConstructAI' } },
+    {
+      name: 'siteTitle',
+      type: 'text',
+      required: true,
+      defaultValue: process.env.NEXT_PUBLIC_APP_NAME ?? 'Oilplot',
+    },
+    {
+      name: 'titleTemplate',
+      type: 'text',
+      defaultValue: `%s | ${process.env.NEXT_PUBLIC_APP_NAME ?? 'Oilplot'}`,
+      admin: { description: 'e.g. %s | Oilplot' },
+    },
     { name: 'defaultDescription', type: 'textarea', admin: { description: 'Fallback meta description' } },
     { name: 'defaultOGImage', type: 'text', admin: { description: 'Fallback OG image URL' } },
   ],

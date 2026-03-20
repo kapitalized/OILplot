@@ -24,7 +24,7 @@ export const PAGES: Record<string, PageMeta> = {
   },
   features: {
     title: 'Features',
-    description: `Explore ${BRAND.name} features: AI extraction, verification workflows, and B2B reporting.`,
+    description: `Explore ${BRAND.name} features: oil data sources, visualisations, and run-your-own analysis.`,
     robots: 'index, follow',
   },
   pricing: {
@@ -94,11 +94,11 @@ export async function getPageMetadata(slug: string): Promise<Metadata> {
 }
 
 /** B2B Software JSON-LD for structured data (blueprint §5). */
-export function getB2BSoftwareJsonLd() {
+export function getB2BSoftwareJsonLd(appName: string = BRAND.name) {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: BRAND.name,
+    name: appName,
     description: BRAND.slogan,
     applicationCategory: 'BusinessApplication',
   };

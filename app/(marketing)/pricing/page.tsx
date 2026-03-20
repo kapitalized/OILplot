@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { BRAND } from '@/lib/brand';
+import { getPageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Pricing',
-  description: `Plans and pricing for ${BRAND.name}. Starter and Pro tiers for teams.`,
-};
+export async function generateMetadata() {
+  return getPageMetadata('pricing');
+}
 
 const plans = [
   { name: 'Starter', price: '$50', period: '/mo', description: 'For small teams getting started.' },

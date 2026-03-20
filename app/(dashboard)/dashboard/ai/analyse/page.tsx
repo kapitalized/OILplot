@@ -157,7 +157,7 @@ export default function AnalysePage() {
         <h2 className="font-semibold text-sm mb-3">Run analysis</h2>
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">Project</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Workspace</label>
             <select
               value={projectId}
               onChange={(e) => setProjectId(e.target.value)}

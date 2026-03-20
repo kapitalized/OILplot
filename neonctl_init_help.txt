@@ -1,0 +1,34 @@
+﻿node.exe : neonctl init
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (neonctl init:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Initialize a project with Neon using your AI coding assistant
+
+Global options:
+-o, --output
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  Set output format [string] [choices: "json", "yaml", "table"
+                    ] [default: "table"]
+--config-dir
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  Path to config directory [string] [default: "C:\Users\Micros
+                    oft\.config\neonctl"]
+--api-key
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  API key [string] [default: ""]
+--color
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  Colorize the output. Example: --no-color, --color false [boo
+                    lean] [default: true]
+--analytics
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  Manage analytics. Example: --no-analytics, --analytics false
+                     [boolean] [default: true]
+-h, --help
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  Show help [boolean] [default: false]
+-v, --version
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  Show version number [boolean]
+
+Options:
+-a, --agent
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ>  Agent to configure (cursor, copilot, code). [string]
+

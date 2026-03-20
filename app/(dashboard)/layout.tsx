@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { BRAND } from '@/lib/brand';
+import { getAppName } from '@/lib/app-name';
 import { isNeonAuthConfigured } from '@/lib/auth/server';
 import { getSessionForLayout } from '@/lib/auth/get-session-for-layout';
 import { createClient } from '@/lib/supabase/server';
@@ -13,6 +14,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const appName = await getAppName();
   let user: { email?: string | null } | null = null;
 
   if (isNeonAuthConfigured()) {
@@ -37,7 +39,7 @@ export default async function DashboardLayout({
     <div className="min-h-screen flex flex-col">
       <header className="border-b px-6 py-3 flex items-center justify-between bg-card">
         <Link href="/dashboard" className="flex items-center" style={{ color: BRAND.colors.primary }}>
-          <img src={BRAND.logo} alt={BRAND.name} className="h-7 w-auto" />
+          <img src={BRAND.logo} alt={appName} className="h-7 w-auto" />
         </Link>
         <nav className="flex items-center gap-6">
           <HealthMonitor />
@@ -68,7 +70,7 @@ export default async function DashboardLayout({
       </header>
       <main className="flex-1 p-6">{children}</main>
       <footer className="border-t px-6 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        <span>System status · {BRAND.name}</span>
+        <span>System status · {appName}</span>
         <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
         <Link href="/terms" className="hover:text-foreground">Terms</Link>
       </footer>

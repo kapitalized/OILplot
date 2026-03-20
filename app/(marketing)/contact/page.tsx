@@ -1,12 +1,14 @@
 import { BRAND } from '@/lib/brand';
 import ContactForm from '@/components/ContactForm';
+import { getAppName } from '@/lib/app-name';
+import { getPageMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Contact',
-  description: `Contact ${BRAND.name} for sales and support.`,
-};
+export async function generateMetadata() {
+  return getPageMetadata('contact');
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const appName = await getAppName();
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <h1 className="text-3xl font-bold tracking-tight">Contact</h1>
@@ -17,7 +19,7 @@ export default function ContactPage() {
         <ContactForm />
       </div>
       <p className="mt-6 text-sm text-muted-foreground">
-        {BRAND.name} — {BRAND.slogan}
+        {appName} — {BRAND.slogan}
       </p>
     </div>
   );
