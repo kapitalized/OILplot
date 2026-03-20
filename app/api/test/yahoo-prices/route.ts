@@ -18,7 +18,8 @@ export async function GET() {
     lookbackDays: 15,
   });
 
-  let latest: null | { price_date: string; price_usd_per_bbl: string | number; oil_type_id: number } = null;
+  let latest: null | { price_date: string; price_usd_per_bbl: string | number | null; oil_type_id: number | null } =
+    null;
   try {
     const row = await db
       .select({

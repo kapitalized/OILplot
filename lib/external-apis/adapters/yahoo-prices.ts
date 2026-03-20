@@ -1,8 +1,8 @@
 import YahooFinance from 'yahoo-finance2';
 import { eq } from 'drizzle-orm';
 import type { IExternalApiAdapter } from '../types';
-import { db } from '@/lib/db';
-import { dim_oil_types, fact_prices, src_scraper_logs } from '@/lib/db/schema';
+import { db, sql } from '@/lib/db';
+import { dim_oil_types, src_scraper_logs } from '@/lib/db/schema';
 
 export type YahooPricesAdapterMarket = {
   /** Oil type code (stored in `dim_oil_types.code`, also used for `name` if `oilTypeName` is omitted). */
@@ -32,14 +32,20 @@ async function getOrCreateOilTypeId(market: YahooPricesAdapterMarket): Promise<n
 
   const name = market.oilTypeName ?? market.oilTypeCode;
   try {
-    const inserted = await db
-      .insert(dim_oil_types)
-      .values({ code: market.oilTypeCode, name })
-      .returning({ id: dim_oil_types.id });
+    // `dim_oil_types.id` is `serial` in SQL. Drizzle typing for this table requires `id` on insert,
+    // so we insert via raw SQL and fetch `id` with RETURNING.
+    const inserted = (await sql`
+      INSERT INTO dim_oil_types (code, name)
+      VALUES (${market.oilTypeCode}, ${name})
+      ON CONFLICT (code)
+      DO UPDATE SET name = EXCLUDED.name
+      RETURNING id
+    `) as Array<{ id: number }>;
+
     const insertedId = inserted[0]?.id;
     if (insertedId != null) return insertedId;
-  } catch (e) {
-    // If the insert races or the code/name already exists, re-read and continue.
+  } catch {
+    // If the insert races or the constraints behave differently, fall back to re-read.
   }
 
   const reloaded = await db
@@ -58,6 +64,24 @@ function toISODate(dateLike: unknown): string {
   const s = String(dateLike);
   // yahoo-finance2 returns ISO strings like `2026-03-19T04:00:00.000Z`
   return s.slice(0, 10);
+}
+
+function getRegularMarketPrice(q: unknown): number | null {
+  if (q == null || typeof q !== 'object') return null;
+  const v = (q as { regularMarketPrice?: unknown }).regularMarketPrice;
+  return typeof v === 'number' && Number.isFinite(v) ? v : null;
+}
+
+function getRegularMarketTime(q: unknown): Date | null {
+  if (q == null || typeof q !== 'object') return null;
+  const v = (q as { regularMarketTime?: unknown }).regularMarketTime;
+  if (v instanceof Date) return v;
+  // In case yahoo-finance2 returns timestamps as numbers, interpret small values as seconds.
+  if (typeof v === 'number' && Number.isFinite(v)) {
+    const ms = v < 1e12 ? v * 1000 : v;
+    return new Date(ms);
+  }
+  return null;
 }
 
 export const yahooPricesAdapter: IExternalApiAdapter = {
@@ -97,21 +121,27 @@ export const yahooPricesAdapter: IExternalApiAdapter = {
         try {
           // `historical()` can be flaky due to Yahoo response shape/nulls; `quote()` is usually more reliable for "latest".
           const q = await yf.quote(market.yahooSymbol);
-          const closePrice = Number((q as any)?.regularMarketPrice);
-          const priceDate = toISODate((q as any)?.regularMarketTime ?? end);
+          const closePrice = getRegularMarketPrice(q);
+          if (closePrice == null) continue;
+          const priceUsdPerBbl = closePrice.toFixed(2);
+          const priceDate = toISODate(getRegularMarketTime(q) ?? end);
 
           if (!Number.isFinite(closePrice)) continue;
 
           const oilTypeId = await getOrCreateOilTypeId(market);
 
           // Ensure uniqueness constraints are satisfied for `price_date` / `market_location` in current schema.
-          await db.delete(fact_prices).where(eq(fact_prices.price_date, priceDate));
-          await db.insert(fact_prices).values({
-            oil_type_id: oilTypeId,
-            price_usd_per_bbl: closePrice,
-            market_location: market.marketLocation,
-            price_date: priceDate,
-          });
+          await sql`
+            DELETE FROM fact_prices
+            WHERE price_date = ${priceDate}
+              OR oil_type_id = ${oilTypeId}
+              OR market_location = ${market.marketLocation}
+          `;
+
+          await sql`
+            INSERT INTO fact_prices (oil_type_id, price_usd_per_bbl, market_location, price_date)
+            VALUES (${oilTypeId}, ${priceUsdPerBbl}::numeric, ${market.marketLocation}, ${priceDate})
+          `;
 
           results.push({
             marketLocation: market.marketLocation,
@@ -128,18 +158,16 @@ export const yahooPricesAdapter: IExternalApiAdapter = {
         }
       }
 
-      await db.insert(src_scraper_logs).values({
-        scraper_name: scraperName,
-        rows_inserted: rowsInserted,
-        status: rowsInserted > 0 ? 'success' : 'error',
-        error_message: rowsInserted > 0 ? null : 'No daily close found for given markets.',
-        raw_response_json: {
-          period1,
-          period2,
-          markets,
-          extracted: results,
-        },
-      });
+      await sql`
+        INSERT INTO src_scraper_logs (scraper_name, rows_inserted, status, error_message, raw_response_json)
+        VALUES (
+          ${scraperName},
+          ${rowsInserted},
+          ${rowsInserted > 0 ? 'success' : 'error'},
+          ${rowsInserted > 0 ? null : 'No daily close found for given markets.'},
+          ${JSON.stringify({ period1, period2, markets, extracted: results })}::jsonb
+        )
+      `;
 
       if (rowsInserted === 0) {
         return { status: 'error', errorMessage: 'No daily close found for given markets.', rawResult: results };
@@ -156,17 +184,16 @@ export const yahooPricesAdapter: IExternalApiAdapter = {
       };
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      await db.insert(src_scraper_logs).values({
-        scraper_name: scraperName,
-        rows_inserted: 0,
-        status: 'error',
-        error_message: msg,
-        raw_response_json: {
-          markets,
-          period1,
-          period2,
-        },
-      });
+      await sql`
+        INSERT INTO src_scraper_logs (scraper_name, rows_inserted, status, error_message, raw_response_json)
+        VALUES (
+          ${scraperName},
+          0,
+          'error',
+          ${msg},
+          ${JSON.stringify({ markets, period1, period2 })}::jsonb
+        )
+      `;
       return { status: 'error', errorMessage: msg };
     }
   },
