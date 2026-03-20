@@ -34,14 +34,26 @@ function SignUpForm() {
     if (isNeonAuthClientConfigured() && authClient) {
       setLoading(true);
       try {
-        const { error: signUpError } = await authClient.signUp.email({
+        const callbackURL =
+          next.startsWith('http://') || next.startsWith('https://')
+            ? next
+            : `${window.location.origin}${next.startsWith('/') ? next : `/${next}`}`;
+        const result = await authClient.signUp.email({
           name: name.trim(),
           email: email.trim(),
           password,
-          callbackURL: next,
+          callbackURL,
         });
+        const signUpError = result.error;
         if (signUpError) {
-          setError(signUpError.message ?? 'Sign up failed.');
+          const e = signUpError as Error & { code?: string; status?: number; cause?: unknown };
+          const extra =
+            typeof e.status === 'number'
+              ? ` (HTTP ${e.status})`
+              : e.code
+                ? ` (${e.code})`
+                : '';
+          setError(`${e.message ?? 'Sign up failed.'}${extra}`);
           return;
         }
         const target = next.startsWith('/') ? next : `/${next}`;
