@@ -1,3 +1,4 @@
+-- Renumbered from 0011_pgvector_embedding (was duplicate 0011_* prefix vs 0011_project_site_type).
 -- Enable pgvector extension (required for vector(1536) columns).
 -- Neon: run this once per branch; extension must be enabled in the project.
 CREATE EXTENSION IF NOT EXISTS vector;

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { authClient, isNeonAuthClientConfigured } from '@/lib/auth/client';
 import { createClient } from '@/lib/supabase/client';
@@ -12,7 +12,6 @@ const supabaseConfigured = () =>
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 function SignUpForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get('next') || '/dashboard';
   const [name, setName] = useState('');
@@ -46,7 +45,12 @@ function SignUpForm() {
         });
         const signUpError = result.error;
         if (signUpError) {
-          const e = signUpError as Error & { code?: string; status?: number; cause?: unknown };
+          const e = signUpError as unknown as {
+            message?: string;
+            code?: string;
+            status?: number;
+            statusText?: string;
+          };
           const extra =
             typeof e.status === 'number'
               ? ` (HTTP ${e.status})`
