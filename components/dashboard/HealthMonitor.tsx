@@ -12,7 +12,7 @@ interface HealthStatus {
 
 const POLL_MS = 60_000;
 
-export function HealthMonitor() {
+export function HealthMonitor({ tone = 'default' }: { tone?: 'default' | 'onInk' }) {
   const [status, setStatus] = useState<HealthStatus | null>(null);
 
   useEffect(() => {
@@ -33,10 +33,16 @@ export function HealthMonitor() {
   function Pill({ label, value }: { label: string; value: Status }) {
     const color =
       value === 'ok'
-        ? 'text-emerald-600 dark:text-emerald-400'
+        ? tone === 'onInk'
+          ? 'text-oilplot-yellow'
+          : 'text-emerald-600 dark:text-emerald-400'
         : value === 'unconfigured'
-          ? 'text-muted-foreground'
-          : 'text-red-600 dark:text-red-400';
+          ? tone === 'onInk'
+            ? 'text-oilplot-cream/50'
+            : 'text-muted-foreground'
+          : tone === 'onInk'
+            ? 'text-oilplot-coral'
+            : 'text-red-600 dark:text-red-400';
     const title =
       value === 'unconfigured' ? `${label}: not configured` : value === 'error' ? `${label}: error` : `${label}: ok`;
     return (
@@ -47,11 +53,13 @@ export function HealthMonitor() {
   }
 
   return (
-    <div className="flex items-center gap-4 text-xs">
+    <div
+      className={`flex items-center gap-4 text-xs${tone === 'onInk' ? ' text-oilplot-cream/90 font-bold uppercase tracking-wider' : ''}`}
+    >
       <Pill label="App" value={status.app} />
-      <span className="text-muted-foreground/50">|</span>
+      <span className={tone === 'onInk' ? 'text-oilplot-cream/30' : 'text-muted-foreground/50'}>|</span>
       <Pill label="Database" value={status.database} />
-      <span className="text-muted-foreground/50">|</span>
+      <span className={tone === 'onInk' ? 'text-oilplot-cream/30' : 'text-muted-foreground/50'}>|</span>
       <Pill label="Model" value={status.model} />
     </div>
   );

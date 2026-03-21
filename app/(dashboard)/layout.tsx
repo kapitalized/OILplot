@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
-import { BRAND } from '@/lib/brand';
+import { OilplotBrandMark } from '@/components/branding/OilplotBrandMark';
 import { getAppName } from '@/lib/app-name';
 import { isNeonAuthConfigured } from '@/lib/auth/server';
 import { getSessionForLayout } from '@/lib/auth/get-session-for-layout';
@@ -19,7 +19,6 @@ export default async function DashboardLayout({
 
   if (isNeonAuthConfigured()) {
     try {
-      // Pass headers so session is resolved from request cookies (required for correct session in Node)
       const session = await getSessionForLayout(await headers());
       user = session?.user ? { email: session.user.email } : null;
     } catch {
@@ -35,24 +34,28 @@ export default async function DashboardLayout({
     }
   }
 
+  const navLink =
+    'text-[11px] font-bold uppercase tracking-[0.18em] text-oilplot-cream/80 hover:text-oilplot-cream';
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b px-6 py-3 flex items-center justify-between bg-card">
-        <Link href="/dashboard" className="flex items-center" style={{ color: BRAND.colors.primary }}>
-          <img src={BRAND.logo} alt={appName} className="h-7 w-auto" />
+    <div className="oilplot-theme min-h-screen flex flex-col bg-oilplot-pale text-foreground">
+      <header className="border-b-4 border-oilplot-ink bg-oilplot-ink text-oilplot-cream px-6 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
+        <Link href="/dashboard" className="flex items-center gap-3 shrink-0 min-w-0">
+          <OilplotBrandMark className="h-9 w-9" />
+          <span className="font-display text-xl sm:text-2xl tracking-tighter truncate">{appName}</span>
         </Link>
-        <nav className="flex items-center gap-6">
-          <HealthMonitor />
-          <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
+        <nav className="flex flex-wrap items-center gap-5">
+          <HealthMonitor tone="onInk" />
+          <Link href="/dashboard" className={navLink}>
             Dashboard
           </Link>
-          <Link href="/dashboard/organisation" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/dashboard/organisation" className={navLink}>
             Organisation
           </Link>
-          <Link href="/dashboard/team" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/dashboard/team" className={navLink}>
             Team
           </Link>
-          <Link href="/dashboard/billing" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/dashboard/billing" className={navLink}>
             Billing
           </Link>
           {user ? (
@@ -60,19 +63,24 @@ export default async function DashboardLayout({
               userEmail={user.email}
               useNeonAuth={isNeonAuthConfigured()}
               signOutAction={isNeonAuthConfigured() ? undefined : signOut}
+              triggerClassName="!text-oilplot-cream hover:!bg-white/10 hover:!text-oilplot-cream"
             />
           ) : (
-            <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link href="/login" className={navLink}>
               Log in
             </Link>
           )}
         </nav>
       </header>
-      <main className="flex-1 p-6">{children}</main>
-      <footer className="border-t px-6 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+      <main className="flex-1 p-6 sm:p-8 max-w-7xl w-full mx-auto">{children}</main>
+      <footer className="border-t-4 border-oilplot-ink bg-oilplot-cream px-6 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] font-bold uppercase tracking-wider text-oilplot-ink/60">
         <span>System status · {appName}</span>
-        <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
-        <Link href="/terms" className="hover:text-foreground">Terms</Link>
+        <Link href="/privacy" className="hover:text-foreground">
+          Privacy
+        </Link>
+        <Link href="/terms" className="hover:text-foreground">
+          Terms
+        </Link>
       </footer>
     </div>
   );

@@ -9,8 +9,8 @@ Use the same Neon project for production (Vercel) and development (localhost). T
 1. Go to [neon.tech](https://neon.tech) and sign in (you already have an account).
 2. Create a **new project** (or use an existing one). Choose region and Postgres version.
 3. In the project → **Connection details** (or Dashboard).
-4. Copy the **connection string** and ensure it ends with `?sslmode=require`.  
-   This is your `DATABASE_URL` (e.g. `postgresql://user:pass@ep-xxx.region.neon.tech/neondb?sslmode=require`).
+4. Copy the **connection string**. Prefer **`sslmode=verify-full`** in the query string (Neon may default to `require`; changing it avoids Node/pg warnings about future libpq semantics).  
+   Example: `postgresql://user:pass@ep-xxx.region.neon.tech/neondb?sslmode=verify-full`
 
 ---
 
@@ -32,7 +32,7 @@ Use the same Neon project for production (Vercel) and development (localhost). T
 
    | Name | Value |
    |------|--------|
-   | `DATABASE_URL` | Neon connection string (with `?sslmode=require`) |
+   | `DATABASE_URL` | Neon connection string (use `sslmode=verify-full` in the URL when possible) |
    | `NEON_AUTH_BASE_URL` | Neon Auth URL from step 2 |
    | `NEON_AUTH_COOKIE_SECRET` | Your 32+ char cookie secret from step 2 |
 

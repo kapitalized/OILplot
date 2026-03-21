@@ -11,9 +11,9 @@ function ChartLineDemo() {
           <stop offset="1" stopColor={BRAND.colors.primary} stopOpacity="0.15" />
         </linearGradient>
       </defs>
-      <rect x="0" y="0" width="320" height="140" rx="14" fill="rgba(148,163,184,0.12)" />
+      <rect x="0" y="0" width="320" height="140" rx="4" fill="rgba(62,50,45,0.06)" stroke={BRAND.colors.ink} strokeWidth="2" />
       {[20, 50, 80, 110].map((y) => (
-        <line key={y} x1="18" y1={y} x2="302" y2={y} stroke="rgba(148,163,184,0.35)" strokeWidth="1" />
+        <line key={y} x1="18" y1={y} x2="302" y2={y} stroke="rgba(62,50,45,0.12)" strokeWidth="1" />
       ))}
       <path
         d="M 18 105 L 62 92 L 98 75 L 142 82 L 186 55 L 230 60 L 266 32 L 302 40"
@@ -45,16 +45,16 @@ function ChartLineDemo() {
 function ChartBarsDemo() {
   return (
     <svg viewBox="0 0 320 140" width="100%" height="140" role="img" aria-label="Demo bar chart">
-      <rect x="0" y="0" width="320" height="140" rx="14" fill="rgba(148,163,184,0.12)" />
+      <rect x="0" y="0" width="320" height="140" rx="4" fill="rgba(62,50,45,0.06)" stroke={BRAND.colors.ink} strokeWidth="2" />
       {Array.from({ length: 5 }).map((_, i) => {
         const y = 24 + i * 23;
-        return <line key={i} x1="22" y1={y} x2="302" y2={y} stroke="rgba(148,163,184,0.35)" strokeWidth="1" />;
+        return <line key={i} x1="22" y1={y} x2="302" y2={y} stroke="rgba(62,50,45,0.12)" strokeWidth="1" />;
       })}
       <g fill={BRAND.colors.primary} opacity="0.9">
         {[70, 52, 78, 40, 92, 62].map((h, i) => {
           const x = 30 + i * 44;
           const y = 120 - h;
-          return <rect key={i} x={x} y={y} width="26" height={h} rx="6" />;
+          return <rect key={i} x={x} y={y} width="26" height={h} rx="2" />;
         })}
       </g>
     </svg>
@@ -64,25 +64,25 @@ function ChartBarsDemo() {
 function ChartDonutDemo() {
   return (
     <svg viewBox="0 0 320 140" width="100%" height="140" role="img" aria-label="Demo donut chart">
-      <rect x="0" y="0" width="320" height="140" rx="14" fill="rgba(148,163,184,0.12)" />
+      <rect x="0" y="0" width="320" height="140" rx="4" fill="rgba(62,50,45,0.06)" stroke={BRAND.colors.ink} strokeWidth="2" />
       <g transform="translate(160 70)">
-        <circle r="44" fill="none" stroke={BRAND.colors.primary} strokeWidth="18" strokeDasharray="140 80" strokeLinecap="round" />
-        <circle r="44" fill="none" stroke="#22c55e" strokeWidth="18" strokeDasharray="90 130" strokeLinecap="round" transform="rotate(70)" />
-        <circle r="44" fill="none" stroke="#3b82f6" strokeWidth="18" strokeDasharray="70 150" strokeLinecap="round" transform="rotate(170)" />
-        <circle r="28" fill="rgba(2,6,23,0.8)" />
-        <text x="0" y="7" textAnchor="middle" fill="white" fontSize="14" fontWeight="700">
+        <circle r="44" fill="none" stroke={BRAND.colors.coral} strokeWidth="18" strokeDasharray="140 80" strokeLinecap="round" />
+        <circle r="44" fill="none" stroke={BRAND.colors.amber} strokeWidth="18" strokeDasharray="90 130" strokeLinecap="round" transform="rotate(70)" />
+        <circle r="44" fill="none" stroke={BRAND.colors.yellow} strokeWidth="18" strokeDasharray="70 150" strokeLinecap="round" transform="rotate(170)" />
+        <circle r="28" fill={BRAND.colors.ink} />
+        <text x="0" y="7" textAnchor="middle" fill={BRAND.colors.cream} fontSize="14" fontWeight="700">
           Mix
         </text>
       </g>
-      <g fill="rgba(148,163,184,0.7)" fontSize="12" fontWeight="600">
+      <g fill={BRAND.colors.ink} opacity="0.55" fontSize="12" fontWeight="600">
         <text x="18" y="32">Light</text>
         <text x="18" y="54">Sweet</text>
         <text x="18" y="76">Heavy</text>
       </g>
       <g transform="translate(90 24)">
         <rect x="0" y="8" width="10" height="10" rx="3" fill={BRAND.colors.primary} opacity="0.9" />
-        <rect x="0" y="30" width="10" height="10" rx="3" fill="#3b82f6" opacity="0.9" />
-        <rect x="0" y="52" width="10" height="10" rx="3" fill="#22c55e" opacity="0.9" />
+        <rect x="0" y="30" width="10" height="10" rx="3" fill={BRAND.colors.amber} opacity="0.9" />
+        <rect x="0" y="52" width="10" height="10" rx="3" fill={BRAND.colors.yellow} opacity="0.9" />
       </g>
     </svg>
   );
@@ -91,15 +91,15 @@ function ChartDonutDemo() {
 function ChartFlowDemo() {
   return (
     <svg viewBox="0 0 320 140" width="100%" height="140" role="img" aria-label="Demo flow diagram">
-      <rect x="0" y="0" width="320" height="140" rx="14" fill="rgba(148,163,184,0.12)" />
-      <rect x="26" y="30" width="78" height="28" rx="10" fill="rgba(37,99,235,0.18)" stroke={BRAND.colors.primary} strokeWidth="1.5" />
-      <rect x="26" y="68" width="78" height="28" rx="10" fill="rgba(37,99,235,0.18)" stroke={BRAND.colors.primary} strokeWidth="1.5" />
-      <rect x="216" y="40" width="78" height="28" rx="10" fill="rgba(37,99,235,0.18)" stroke={BRAND.colors.primary} strokeWidth="1.5" />
-      <rect x="216" y="80" width="78" height="28" rx="10" fill="rgba(37,99,235,0.18)" stroke={BRAND.colors.primary} strokeWidth="1.5" />
+      <rect x="0" y="0" width="320" height="140" rx="4" fill="rgba(62,50,45,0.06)" stroke={BRAND.colors.ink} strokeWidth="2" />
+      <rect x="26" y="30" width="78" height="28" rx="4" fill="rgba(242,168,58,0.25)" stroke={BRAND.colors.ink} strokeWidth="2" />
+      <rect x="26" y="68" width="78" height="28" rx="4" fill="rgba(242,168,58,0.25)" stroke={BRAND.colors.ink} strokeWidth="2" />
+      <rect x="216" y="40" width="78" height="28" rx="4" fill="rgba(242,168,58,0.25)" stroke={BRAND.colors.ink} strokeWidth="2" />
+      <rect x="216" y="80" width="78" height="28" rx="4" fill="rgba(242,168,58,0.25)" stroke={BRAND.colors.ink} strokeWidth="2" />
       <path d="M 104 44 C 140 44, 160 44, 216 54" stroke={BRAND.colors.primary} strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.85" />
       <path d="M 104 82 C 140 80, 170 82, 216 94" stroke={BRAND.colors.primary} strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.85" />
-      <path d="M 104 58 C 140 62, 170 62, 216 70" stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.75" />
-      <g fill="rgba(148,163,184,0.8)" fontSize="12" fontWeight="600">
+      <path d="M 104 58 C 140 62, 170 62, 216 70" stroke={BRAND.colors.burnt} strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.9" />
+      <g fill={BRAND.colors.ink} opacity="0.65" fontSize="12" fontWeight="600">
         <text x="65" y="48" textAnchor="middle">Source</text>
         <text x="65" y="86" textAnchor="middle">Source</text>
         <text x="255" y="58" textAnchor="middle">Output</text>
@@ -112,72 +112,72 @@ function ChartFlowDemo() {
 export default async function MarketingPage() {
   const appName = await getAppName();
   return (
-    <div className="min-h-[80vh]">
-      {/* Hero */}
-      <section className="px-6 py-20 text-center">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+    <div className="min-h-[70vh]">
+      {/* Hero — demo: ink kicker + huge italic headline on pale blue field */}
+      <section className="text-center">
+        <div className="inline-block px-3 py-1 bg-oilplot-ink text-oilplot-cream text-[10px] font-bold uppercase tracking-[0.25em] mb-6 border-2 border-oilplot-ink">
+          Daily Intelligence Report · Open data
+        </div>
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl leading-[0.85] max-w-5xl mx-auto">
           Oil data visualisations & analysis, powered by large datasets
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="mt-8 text-base sm:text-lg text-oilplot-ink/75 max-w-2xl mx-auto font-medium leading-relaxed">
           Search open oil data sources, explore interactive charts, and run your own analysis—without enterprise terminals.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href="/dashboard"
-            className="inline-flex items-center px-6 py-3 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: BRAND.colors.primary }}
+            className="inline-flex items-center px-6 py-3 text-sm font-bold uppercase tracking-wide text-primary-foreground border-2 border-oilplot-ink bg-primary shadow-retro-sm hover:opacity-95 transition-opacity"
           >
             Open the app
           </Link>
           <Link
             href="/features"
-            className="inline-flex items-center px-6 py-3 rounded-lg font-semibold border border-border hover:bg-muted transition-colors"
+            className="inline-flex items-center px-6 py-3 text-sm font-bold uppercase tracking-wide border-4 border-oilplot-ink bg-oilplot-cream text-oilplot-ink shadow-retro-sm hover:-translate-y-0.5 transition-transform"
           >
             See features
           </Link>
         </div>
       </section>
 
-      {/* Value props */}
-      <section className="border-t bg-muted/40 px-6 py-16">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="text-2xl font-semibold text-center mb-10">Why {appName}</h2>
-          <div className="grid gap-8 sm:grid-cols-3 text-center">
-            <div>
-              <h3 className="font-semibold" style={{ color: BRAND.colors.primary }}>Oil dataset discovery</h3>
-              <p className="mt-2 text-muted-foreground text-sm">
-                Browse sources and ingest curated data into a transparent, queryable repository.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold" style={{ color: BRAND.colors.primary }}>Visualise oil signals</h3>
-              <p className="mt-2 text-muted-foreground text-sm">
-                Generate interactive visuals from facts (prices, shipments, production) in one place.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold" style={{ color: BRAND.colors.primary }}>Run your own analysis</h3>
-              <p className="mt-2 text-muted-foreground text-sm">
-                Chat with the data, retrieve evidence, and iterate on your findings.
-              </p>
-            </div>
+      {/* Value props — cream cards on pale blue (demo story-card style) */}
+      <section className="mt-16 sm:mt-20">
+        <h2 className="text-3xl sm:text-4xl text-center mb-10 sm:mb-12">Why {appName}</h2>
+        <div className="grid gap-6 sm:grid-cols-3">
+          <div className="border-4 border-oilplot-ink bg-oilplot-cream p-6 sm:p-8 shadow-retro text-left min-h-[200px] flex flex-col justify-between hover:-translate-y-0.5 transition-transform">
+            <h3 className="text-lg sm:text-xl border-2 border-oilplot-ink inline-block px-2 py-0.5 bg-oilplot-coral text-white w-fit">Discovery</h3>
+            <p className="mt-4 text-sm font-medium text-oilplot-ink/80 leading-relaxed">
+              Browse sources and ingest curated data into a transparent, queryable repository.
+            </p>
+          </div>
+          <div className="border-4 border-oilplot-ink bg-oilplot-cream p-6 sm:p-8 shadow-retro text-left min-h-[200px] flex flex-col justify-between hover:-translate-y-0.5 transition-transform">
+            <h3 className="text-lg sm:text-xl border-2 border-oilplot-ink inline-block px-2 py-0.5 bg-oilplot-amber text-oilplot-ink w-fit">Visuals</h3>
+            <p className="mt-4 text-sm font-medium text-oilplot-ink/80 leading-relaxed">
+              Generate interactive visuals from facts (prices, shipments, production) in one place.
+            </p>
+          </div>
+          <div className="border-4 border-oilplot-ink bg-oilplot-cream p-6 sm:p-8 shadow-retro text-left min-h-[200px] flex flex-col justify-between hover:-translate-y-0.5 transition-transform">
+            <h3 className="text-lg sm:text-xl border-2 border-oilplot-ink inline-block px-2 py-0.5 bg-oilplot-burnt text-oilplot-cream w-fit">Analysis</h3>
+            <p className="mt-4 text-sm font-medium text-oilplot-ink/80 leading-relaxed">
+              Chat with the data, retrieve evidence, and iterate on your findings.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Example visual cards */}
-      <section className="px-6 py-16">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold tracking-tight text-center">Example visual cards</h2>
-          <p className="mt-3 text-muted-foreground text-center max-w-2xl mx-auto">
-            4 dummy visuals to illustrate the future Oilplot story-card layout.
+      <section className="mt-16 sm:mt-24 pt-12 border-t-4 border-oilplot-ink/30">
+        <div>
+          <h2 className="text-3xl sm:text-5xl text-center mb-3">Example visual cards</h2>
+          <p className="text-sm font-medium text-oilplot-ink/65 text-center max-w-2xl mx-auto">
+            Dummy visuals — thick borders & cream panels like the story engine demo.
           </p>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2">
-            <div className="rounded-xl border bg-card p-5">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+            <div className="relative border-4 border-oilplot-ink bg-oilplot-cream p-6 shadow-retro">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Spot price terminal</h3>
+                  <h3 className="text-lg font-black uppercase italic tracking-tight">Spot price terminal</h3>
                   <p className="mt-1 text-sm text-muted-foreground">Explore spreads and time ranges (placeholder).</p>
                 </div>
                 <span className="text-xs rounded-full border px-3 py-1 text-muted-foreground">Demo</span>
@@ -192,10 +192,10 @@ export default async function MarketingPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border bg-card p-5">
+            <div className="relative border-4 border-oilplot-ink bg-oilplot-cream p-6 shadow-retro">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Shipment volumes</h3>
+                  <h3 className="text-lg font-black uppercase italic tracking-tight">Shipment volumes</h3>
                   <p className="mt-1 text-sm text-muted-foreground">See flow patterns between origins and refineries (placeholder).</p>
                 </div>
                 <span className="text-xs rounded-full border px-3 py-1 text-muted-foreground">Demo</span>
@@ -210,10 +210,10 @@ export default async function MarketingPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border bg-card p-5">
+            <div className="relative border-4 border-oilplot-ink bg-oilplot-cream p-6 shadow-retro">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Oil type mix</h3>
+                  <h3 className="text-lg font-black uppercase italic tracking-tight">Oil type mix</h3>
                   <p className="mt-1 text-sm text-muted-foreground">Visualise category mix (placeholder).</p>
                 </div>
                 <span className="text-xs rounded-full border px-3 py-1 text-muted-foreground">Demo</span>
@@ -228,10 +228,10 @@ export default async function MarketingPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border bg-card p-5">
+            <div className="relative border-4 border-oilplot-ink bg-oilplot-cream p-6 shadow-retro">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Flow story (Sankey-style)</h3>
+                  <h3 className="text-lg font-black uppercase italic tracking-tight">Flow story (Sankey-style)</h3>
                   <p className="mt-1 text-sm text-muted-foreground">Track input-to-output mapping (placeholder).</p>
                 </div>
                 <span className="text-xs rounded-full border px-3 py-1 text-muted-foreground">Demo</span>
@@ -250,12 +250,12 @@ export default async function MarketingPage() {
       </section>
 
       {/* CTA + nav */}
-      <section className="px-6 py-16 text-center">
-        <p className="text-muted-foreground mb-6">
+      <section className="px-6 py-16 text-center border-t-4 border-oilplot-ink bg-oilplot-cream">
+        <p className="text-muted-foreground mb-6 font-medium max-w-xl mx-auto">
           Ready to explore oil data? Go to the app, or browse the visuals and features.
         </p>
-        <div className="flex flex-wrap justify-center gap-6 text-sm">
-          <Link href="/dashboard" className="font-medium hover:underline" style={{ color: BRAND.colors.primary }}>
+        <div className="flex flex-wrap justify-center gap-6 text-sm font-bold uppercase tracking-wide">
+          <Link href="/dashboard" className="text-oilplot-coral hover:underline">
             App (Dashboard)
           </Link>
           <Link href="/features" className="text-muted-foreground hover:text-foreground">Features</Link>

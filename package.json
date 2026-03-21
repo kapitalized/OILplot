@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node scripts/fix-importmap.mjs && next dev --turbo",
     "dev:fresh": "node scripts/fix-importmap.mjs && node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && next dev --turbo",
+    "dev:webpack": "node scripts/fix-importmap.mjs && next dev",
     "prebuild": "node scripts/fix-importmap.mjs",
     "build": "node scripts/fix-importmap.mjs && node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && next build",
     "payload": "payload",

@@ -1,7 +1,7 @@
 -- Oilplot (Oil Data Repository) - oil-only table set
 --
 -- Required env vars for the app to connect (local/dev):
--- - DATABASE_URL (Neon connection string with `?sslmode=require&channel_binding=require`)
+-- - DATABASE_URL (Neon connection string; prefer `sslmode=verify-full` + optional `channel_binding=require`)
 -- - NEON_AUTH_BASE_URL (Neon Auth URL)
 -- - NEON_AUTH_COOKIE_SECRET (cookie secret from Neon Auth setup)
 --

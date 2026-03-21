@@ -7,6 +7,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'var(--font-sans)', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         background: 'hsl(var(--background))',
@@ -14,6 +18,22 @@ const config: Config = {
         muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
         card: 'hsl(var(--card))',
         'card-foreground': 'hsl(var(--card-foreground))',
+        primary: { DEFAULT: 'hsl(var(--primary))', foreground: 'hsl(var(--primary-foreground))' },
+        ring: 'hsl(var(--ring))',
+        /** Explicit Oilplot palette (hex) — charts, borders, one-off UI */
+        oilplot: {
+          ink: '#3E322D',
+          cream: '#F2EBD4',
+          pale: '#A5C2D0',
+          yellow: '#F8C43F',
+          amber: '#F2A83A',
+          burnt: '#F27D3B',
+          coral: '#F14A42',
+        },
+      },
+      boxShadow: {
+        retro: '8px 8px 0 0 #3E322D',
+        'retro-sm': '4px 4px 0 0 #3E322D',
       },
     },
   },

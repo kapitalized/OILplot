@@ -1,4 +1,5 @@
 import { BRAND } from '@/lib/brand';
+import { OilplotBrandMark } from '@/components/branding/OilplotBrandMark';
 import { getAppName } from '@/lib/app-name';
 
 export default async function AuthLayout({
@@ -8,11 +9,17 @@ export default async function AuthLayout({
 }) {
   const appName = await getAppName();
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 p-4">
+    <div className="oilplot-theme min-h-screen flex flex-col items-center justify-center bg-oilplot-pale p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <img src={BRAND.logo} alt={appName} className="h-10 w-auto mx-auto" />
-          <p className="text-sm text-muted-foreground mt-3">{BRAND.slogan}</p>
+          <div className="inline-block border-4 border-oilplot-ink bg-oilplot-cream px-6 py-5 shadow-retro">
+            <div className="flex items-center justify-center gap-3">
+              <OilplotBrandMark className="h-11 w-11" />
+              <span className="font-display text-2xl tracking-tighter text-oilplot-ink">{appName}</span>
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-muted-foreground mt-4">{BRAND.tagline}</p>
+            <p className="text-sm text-muted-foreground mt-2 normal-case tracking-normal">{BRAND.slogan}</p>
+          </div>
         </div>
         {children}
       </div>

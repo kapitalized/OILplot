@@ -9,9 +9,11 @@ interface UserMenuProps {
   useNeonAuth: boolean;
   /** Server action for sign out when using Supabase */
   signOutAction?: () => Promise<void>;
+  /** e.g. on ink nav bar: text-oilplot-cream hover:bg-white/10 */
+  triggerClassName?: string;
 }
 
-export function UserMenu({ userEmail, useNeonAuth, signOutAction }: UserMenuProps) {
+export function UserMenu({ userEmail, useNeonAuth, signOutAction, triggerClassName }: UserMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -28,7 +30,7 @@ export function UserMenu({ userEmail, useNeonAuth, signOutAction }: UserMenuProp
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+        className={`flex items-center gap-2 rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 ${triggerClassName ?? ''}`}
         aria-expanded={open}
         aria-haspopup="true"
         aria-label="User menu"

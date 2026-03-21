@@ -1,8 +1,22 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { Archivo_Black, Space_Grotesk } from 'next/font/google';
 import { BRAND } from '@/lib/brand';
 import { getAppName } from '@/lib/app-name';
 import './globals.css';
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const archivoBlack = Archivo_Black({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const pathname = (await headers()).get('x-pathname') ?? '';
@@ -33,7 +47,7 @@ export default async function RootLayout({
   }
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${spaceGrotesk.variable} ${archivoBlack.variable} font-sans`}>{children}</body>
     </html>
   );
 }
