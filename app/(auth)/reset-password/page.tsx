@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
-import { authClient, isNeonAuthClientConfigured } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth/client';
+import { useNeonAuthReady } from '@/lib/auth/use-neon-auth-ready';
 import { createClient } from '@/lib/supabase/client';
 
 const supabaseConfigured = () =>
@@ -21,6 +22,7 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const neonReady = useNeonAuthReady();
   useEffect(() => setMounted(true), []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -39,7 +41,7 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (isNeonAuthClientConfigured() && authClient) {
+    if (neonReady && authClient) {
       setLoading(true);
       try {
         const result = await (authClient as { resetPassword?: (opts: { newPassword: string; token: string }) => Promise<{ error?: { message?: string } } | undefined> }).resetPassword?.({
@@ -95,7 +97,7 @@ function ResetPasswordForm() {
     );
   }
 
-  if (!token && mounted) {
+  if (!token) {
     return (
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         <h2 className="text-lg font-semibold">Invalid link</h2>
@@ -108,6 +110,28 @@ function ResetPasswordForm() {
         <span className="mx-2 text-muted-foreground">|</span>
         <Link href="/login" className="text-sm font-medium text-primary hover:underline">
           Log in
+        </Link>
+      </div>
+    );
+  }
+
+  if (neonReady === null) {
+    return (
+      <div className="rounded-xl border bg-card p-6 shadow-sm animate-pulse h-48" aria-busy>
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      </div>
+    );
+  }
+
+  if (neonReady === false && !supabaseConfigured()) {
+    return (
+      <div className="rounded-xl border bg-card p-6 shadow-sm">
+        <h2 className="text-lg font-semibold">Reset password</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Configure Neon Auth or Supabase in <code className="rounded bg-muted px-1">.env.local</code> to reset your password.
+        </p>
+        <Link href="/login" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">
+          Back to Log in
         </Link>
       </div>
     );

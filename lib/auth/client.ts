@@ -12,7 +12,3 @@ export const authClient = createAuthClient({
   baseURL: baseUrl || undefined,
   fetchOptions: { credentials: 'include' as RequestCredentials },
 });
-
-export function isNeonAuthClientConfigured(): boolean {
-  return typeof window !== 'undefined';
-}

@@ -57,6 +57,8 @@ Use the same Neon project for production (Vercel) and development (localhost). T
 3. Add other vars as needed (e.g. `PAYLOAD_SECRET`, `BLOB_READ_WRITE_TOKEN`). See `.env.example`.
 4. Run `npm run dev`. The app will use Neon for DB and auth on localhost.
 
+If sign-up or login returns **HTTP 503**, the auth API has no handler: set **`NEON_AUTH_BASE_URL`** and **`NEON_AUTH_COOKIE_SECRET`** in `.env.local` (see table above), restart the dev server, and try again. The UI uses `GET /api/auth/ready` to detect this—do not leave those vars empty while testing Neon Auth.
+
 ---
 
 ## 5. Optional: sync schema (Drizzle)

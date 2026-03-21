@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
-import { authClient, isNeonAuthClientConfigured } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth/client';
+import { useNeonAuthReady } from '@/lib/auth/use-neon-auth-ready';
 import { createClient } from '@/lib/supabase/client';
 
 const supabaseConfigured = () =>
@@ -20,6 +21,7 @@ function SignUpForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const neonReady = useNeonAuthReady();
   useEffect(() => setMounted(true), []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -30,7 +32,7 @@ function SignUpForm() {
       return;
     }
 
-    if (isNeonAuthClientConfigured() && authClient) {
+    if (neonReady && authClient) {
       setLoading(true);
       try {
         const callbackURL =
@@ -101,7 +103,7 @@ function SignUpForm() {
     setError('No auth configured.');
   }
 
-  if (mounted && !isNeonAuthClientConfigured() && !supabaseConfigured()) {
+  if (mounted && neonReady === false && !supabaseConfigured()) {
     return (
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         <h2 className="text-lg font-semibold">Create account</h2>
@@ -109,6 +111,14 @@ function SignUpForm() {
         <Link href="/login" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">
           Back to Log in
         </Link>
+      </div>
+    );
+  }
+
+  if (mounted && neonReady === null) {
+    return (
+      <div className="rounded-xl border bg-card p-6 shadow-sm animate-pulse h-64" aria-busy>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     );
   }

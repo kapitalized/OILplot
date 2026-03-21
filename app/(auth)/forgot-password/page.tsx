@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { Suspense, useState, useEffect } from 'react';
-import { authClient, isNeonAuthClientConfigured } from '@/lib/auth/client';
+import { authClient } from '@/lib/auth/client';
+import { useNeonAuthReady } from '@/lib/auth/use-neon-auth-ready';
 import { createClient } from '@/lib/supabase/client';
 
 const supabaseConfigured = () =>
@@ -16,6 +17,7 @@ function ForgotPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const neonReady = useNeonAuthReady();
   useEffect(() => setMounted(true), []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -23,7 +25,7 @@ function ForgotPasswordForm() {
     setError('');
     setSuccess(false);
 
-    if (isNeonAuthClientConfigured() && authClient) {
+    if (neonReady && authClient) {
       setLoading(true);
       try {
         const redirectTo =
@@ -75,7 +77,7 @@ function ForgotPasswordForm() {
     setError('No auth configured.');
   }
 
-  if (mounted && !isNeonAuthClientConfigured() && !supabaseConfigured()) {
+  if (mounted && neonReady === false && !supabaseConfigured()) {
     return (
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         <h2 className="text-lg font-semibold">Forgot password</h2>
@@ -83,6 +85,14 @@ function ForgotPasswordForm() {
         <Link href="/login" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">
           Back to Log in
         </Link>
+      </div>
+    );
+  }
+
+  if (mounted && neonReady === null) {
+    return (
+      <div className="rounded-xl border bg-card p-6 shadow-sm animate-pulse h-48" aria-busy>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     );
   }

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useActionState } from 'react';
-import { authClient, isNeonAuthClientConfigured } from '@/lib/auth/client';
+import { useNeonAuthReady } from '@/lib/auth/use-neon-auth-ready';
 import { createClient } from '@/lib/supabase/client';
 import { signInWithEmailNeon } from './actions';
 // supabase not used
@@ -21,7 +21,8 @@ function LoginForm() {
   const [mounted, setMounted] = useState(false);
   const [supabaseLoading, setSupabaseLoading] = useState(false);
   const [state, formAction, isPending] = useActionState(signInWithEmailNeon, null);
-  const useNeon = mounted && isNeonAuthClientConfigured();
+  const neonReady = useNeonAuthReady();
+  const useNeon = mounted && neonReady === true;
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -63,7 +64,7 @@ function LoginForm() {
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    if (supabaseConfigured() && !useNeon) {
+    if (supabaseConfigured() && neonReady === false) {
       e.preventDefault();
       handleSubmitSupabase(e);
     }
@@ -71,7 +72,7 @@ function LoginForm() {
 
   const loading = useNeon ? isPending : supabaseLoading;
 
-  if (mounted && !isNeonAuthClientConfigured() && !supabaseConfigured()) {
+  if (mounted && neonReady === false && !supabaseConfigured()) {
     return (
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         <h2 className="text-lg font-semibold">Log in</h2>
@@ -81,6 +82,14 @@ function LoginForm() {
         <Link href="/dashboard" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">
           Continue to Dashboard (no auth) →
         </Link>
+      </div>
+    );
+  }
+
+  if (mounted && neonReady === null) {
+    return (
+      <div className="rounded-xl border bg-card p-6 shadow-sm animate-pulse h-48" aria-busy>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     );
   }
