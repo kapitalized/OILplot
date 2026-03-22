@@ -13,12 +13,14 @@
     "migrate:external-apis": "node scripts/migrate-external-apis.mjs",
     "fix:importmap": "node scripts/fix-importmap.mjs",
     "seed:payload": "node scripts/seed-payload-pages.mjs",
+    "seed:oil-sources": "node scripts/seed-oil-api-sources.mjs",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "python:dev": "cd services/python-engine && uvicorn main:app --reload --port 8000"
+    "python:dev": "cd services/python-engine && uvicorn main:app --reload --port 8000",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@neondatabase/auth": "^0.2.0-beta.1",
@@ -49,6 +51,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.28.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "15.5.12",

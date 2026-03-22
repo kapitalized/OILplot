@@ -12,6 +12,15 @@ Modular layer to receive data from external APIs. Easy to add new adapters.
    - **Headers**: `Authorization: Bearer YOUR_CRON_SECRET` or `X-Cron-Secret: YOUR_CRON_SECRET`.
    - Set `CRON_SECRET` in your env (e.g. Vercel).
 
+## Built-in oil adapters
+
+| Key | Purpose |
+|-----|--------|
+| `yahoo-prices` | Yahoo Finance quote → `fact_prices` + `src_scraper_logs` |
+| `eia-petroleum` | EIA v2 `petroleum/pri/spt` (default series **RWTC**) → `fact_prices` + `src_scraper_logs`. Env: **`EIA_API_KEY`**. |
+
+Seed default Payload sources: **`npm run seed:oil-sources`** (dev server running).
+
 ## Adding a new adapter
 
 1. Create `lib/external-apis/adapters/your-adapter.ts` implementing `IExternalApiAdapter` (see `generic.ts`).

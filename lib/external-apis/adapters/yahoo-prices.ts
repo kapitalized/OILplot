@@ -1,8 +1,8 @@
 import YahooFinance from 'yahoo-finance2';
-import { eq } from 'drizzle-orm';
 import type { IExternalApiAdapter } from '../types';
-import { db, sql } from '@/lib/db';
-import { dim_oil_types, src_scraper_logs } from '@/lib/db/schema';
+import { getOrCreateOilTypeId } from '../oil-dim';
+import { sql } from '@/lib/db';
+import { src_scraper_logs } from '@/lib/db/schema';
 
 export type YahooPricesAdapterMarket = {
   /** Oil type code (stored in `dim_oil_types.code`, also used for `name` if `oilTypeName` is omitted). */
@@ -19,45 +19,6 @@ export type YahooPricesAdapterConfig = {
   /** How far back to look for the last daily close. */
   lookbackDays?: number;
 };
-
-async function getOrCreateOilTypeId(market: YahooPricesAdapterMarket): Promise<number> {
-  const existing = await db
-    .select({ id: dim_oil_types.id })
-    .from(dim_oil_types)
-    .where(eq(dim_oil_types.code, market.oilTypeCode))
-    .limit(1);
-
-  const existingId = existing[0]?.id;
-  if (existingId != null) return existingId;
-
-  const name = market.oilTypeName ?? market.oilTypeCode;
-  try {
-    // `dim_oil_types.id` is `serial` in SQL. Drizzle typing for this table requires `id` on insert,
-    // so we insert via raw SQL and fetch `id` with RETURNING.
-    const inserted = (await sql`
-      INSERT INTO dim_oil_types (code, name)
-      VALUES (${market.oilTypeCode}, ${name})
-      ON CONFLICT (code)
-      DO UPDATE SET name = EXCLUDED.name
-      RETURNING id
-    `) as Array<{ id: number }>;
-
-    const insertedId = inserted[0]?.id;
-    if (insertedId != null) return insertedId;
-  } catch {
-    // If the insert races or the constraints behave differently, fall back to re-read.
-  }
-
-  const reloaded = await db
-    .select({ id: dim_oil_types.id })
-    .from(dim_oil_types)
-    .where(eq(dim_oil_types.code, market.oilTypeCode))
-    .limit(1);
-
-  const reloadedId = reloaded[0]?.id;
-  if (reloadedId == null) throw new Error(`Failed to resolve dim_oil_types for code=${market.oilTypeCode}`);
-  return reloadedId;
-}
 
 function toISODate(dateLike: unknown): string {
   if (dateLike instanceof Date) return dateLike.toISOString().slice(0, 10);

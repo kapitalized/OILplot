@@ -5,9 +5,17 @@ This folder holds **versioned SQL migrations** for Postgres (Neon). Drizzle Kit 
 ## Apply migrations
 
 ```bash
-# Ensure DATABASE_URL points at your Neon DB
+# Ensure DATABASE_URL points at your Neon DB (in .env.local — loaded by drizzle.config.ts)
 npx drizzle-kit migrate
 ```
+
+## Drizzle Studio (browse tables)
+
+```bash
+npm run db:studio
+```
+
+Opens `https://local.drizzle.studio`. If you see `ECONNREFUSED` to `localhost:5432`, `DATABASE_URL` was not loaded — put your Neon URL in **`.env.local`** at the repo root and run again (same file as Next.js uses).
 
 ## Layout
 

@@ -14,7 +14,7 @@
 -- Tables:
 -- - dim_* lookups: `dim_countries`, `dim_oil_types`, `dim_oil_types_app`, `dim_refineries`, `dim_wells`
 -- - fact_* time-series: `fact_prices`, `fact_prices_app`, `fact_production`, `fact_shipments`, `fact_well_output`
--- - src_* logs: `src_scraper_logs`
+-- - src_* logs: `src_scraper_logs` — human-readable notes: `docs/src_scraper_logs.md`
 
 CREATE SCHEMA "public";
 CREATE TABLE "dim_countries" (

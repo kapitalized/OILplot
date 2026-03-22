@@ -24,6 +24,18 @@ interface ApiRun {
   errorMessage: string | null;
 }
 
+interface IngestionStatus {
+  counts: { fact_prices: number; fact_shipments: number; fact_production: number };
+  scraper_logs: Array<{
+    log_id: number;
+    scraper_name: string | null;
+    run_time: string | null;
+    rows_inserted: number | null;
+    status: string | null;
+    error_message: string | null;
+  }>;
+}
+
 function formatDate(s: string | null): string {
   if (!s) return '—';
   try {
@@ -43,10 +55,13 @@ export function ExternalApisView() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [testingId, setTestingId] = useState<string | null>(null);
   const [healthResult, setHealthResult] = useState<Record<string, { ok: boolean; message: string }>>({});
+  const [ingestion, setIngestion] = useState<IngestionStatus | null>(null);
+  const [ingestionError, setIngestionError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
     setError(null);
+    setIngestionError(null);
     Promise.all([
       fetch('/api/admin/external-apis/sources', { credentials: 'include' }).then((r) =>
         r.ok ? r.json() : Promise.reject(new Error('Failed to load sources'))
@@ -61,6 +76,14 @@ export function ExternalApisView() {
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+
+    void fetch('/api/admin/ingestion-status', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`${r.status}`))))
+      .then((iRes) => setIngestion(iRes as IngestionStatus))
+      .catch(() => {
+        setIngestion(null);
+        setIngestionError('Neon oil tables unavailable (run migrations / check DATABASE_URL).');
+      });
   }, []);
 
   useEffect(() => {
@@ -152,6 +175,78 @@ export function ExternalApisView() {
         : call the Cron URL with <code className="rounded bg-muted px-1">Authorization: Bearer CRON_SECRET</code> or{' '}
         <code className="rounded bg-muted px-1">X-Cron-Secret: CRON_SECRET</code>.
       </p>
+
+      <section className="rounded border border-gray-200 bg-muted/30 p-4">
+        <h2 className="mb-2 text-lg font-semibold">Oil repository (Neon)</h2>
+        <p className="mb-3 text-sm text-muted-foreground">
+          Row counts and latest scraper logs from <code className="rounded bg-muted px-1">src_scraper_logs</code>.           Seed default API sources (Yahoo + EIA):{' '}
+          <code className="rounded bg-muted px-1">POST /api/seed-oil-api-sources?key=INTERNAL_SERVICE_KEY</code> (see{' '}
+          <code className="rounded bg-muted px-1">docs/OIL_DATA_INGESTION_ACTION_PLAN.md</code>).
+        </p>
+        {ingestionError && <p className="mb-2 text-sm text-amber-800">{ingestionError}</p>}
+        {!ingestion && !ingestionError && <p className="mb-2 text-sm text-muted-foreground">Loading DB metrics…</p>}
+        {ingestion && (
+          <>
+            <div className="mb-4 flex flex-wrap gap-4 text-sm">
+              <span>
+                <strong>fact_prices:</strong> {ingestion.counts.fact_prices}
+              </span>
+              <span>
+                <strong>fact_shipments:</strong> {ingestion.counts.fact_shipments}
+              </span>
+              <span>
+                <strong>fact_production:</strong> {ingestion.counts.fact_production}
+              </span>
+            </div>
+            <div className="overflow-x-auto rounded border bg-white">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="p-2 text-left font-medium">Scraper</th>
+                    <th className="p-2 text-left font-medium">Run time</th>
+                    <th className="p-2 text-left font-medium">Status</th>
+                    <th className="p-2 text-left font-medium">Rows</th>
+                    <th className="p-2 text-left font-medium">Error</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ingestion.scraper_logs.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-3 text-muted-foreground">
+                        No scraper logs yet. Run a source or cron job.
+                      </td>
+                    </tr>
+                  ) : (
+                    ingestion.scraper_logs.map((log) => (
+                      <tr key={log.log_id} className="border-b last:border-0">
+                        <td className="p-2 font-mono text-xs">{log.scraper_name ?? '—'}</td>
+                        <td className="p-2 text-muted-foreground">{formatDate(log.run_time)}</td>
+                        <td className="p-2">
+                          <span
+                            className={
+                              log.status === 'success'
+                                ? 'text-green-600'
+                                : log.status === 'error'
+                                  ? 'text-red-600'
+                                  : ''
+                            }
+                          >
+                            {log.status ?? '—'}
+                          </span>
+                        </td>
+                        <td className="p-2">{log.rows_inserted ?? '—'}</td>
+                        <td className="max-w-[240px] truncate p-2 text-muted-foreground" title={log.error_message ?? ''}>
+                          {log.error_message ?? '—'}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </section>
 
       <section>
         <h2 className="mb-2 text-lg font-semibold">Sources</h2>

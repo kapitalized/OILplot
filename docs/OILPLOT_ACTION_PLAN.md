@@ -34,6 +34,8 @@
 
 ## 4. API ingestion (Phase 1)
 
+**Operational action plan (Payload sources, Yahoo adapter, cron):** see **`docs/OIL_DATA_INGESTION_ACTION_PLAN.md`**.
+
 - **`/api/ingest/eia`** (GET): Call EIA API v2 (env: `EIA_API_KEY`); map to `fact_shipments` (and any staging); log to `src_scraper_logs`.
 - **`/api/ingest/prices`** (or `/api/ingest/oilprice`): Yahoo Finance (e.g. yahoo-finance2) and/or OilPriceAPI.com free tier → `fact_prices`; same logging.
 - **`/api/ingest/oilprice`** (if separate): OilPriceAPI integration → `fact_prices`.
