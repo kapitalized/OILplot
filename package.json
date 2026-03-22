@@ -9,11 +9,14 @@
     "prebuild": "node scripts/fix-importmap.mjs",
     "build": "node scripts/fix-importmap.mjs && node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && next build",
     "payload": "payload",
+    "payload:migrate": "payload migrate",
     "payload:importmap": "payload generate:importmap && node scripts/fix-importmap.mjs",
     "migrate:external-apis": "node scripts/migrate-external-apis.mjs",
     "fix:importmap": "node scripts/fix-importmap.mjs",
     "seed:payload": "node scripts/seed-payload-pages.mjs",
     "seed:oil-sources": "node scripts/seed-oil-api-sources.mjs",
+    "repair:payload": "tsx scripts/repair-payload-schema-direct.ts",
+    "repair:payload:api": "node scripts/repair-payload-schema.mjs",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "start": "next start",
     "lint": "next lint",
@@ -57,6 +60,7 @@
     "eslint-config-next": "15.5.12",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
+    "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^4.1.0"
   }

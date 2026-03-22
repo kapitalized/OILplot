@@ -61,7 +61,43 @@ If sign-up or login returns **HTTP 503**, the auth API has no handler: set **`NE
 
 ---
 
-## 5. Optional: sync schema (Drizzle)
+## 5. Payload CMS (`/admin`) — apply migrations
+
+The admin UI needs Payload tables in the **same** Neon database (`users`, `users_sessions`, `pages`, `api_sources`, etc.). Those are **not** created by Drizzle’s oil migrations alone.
+
+`payload.config.ts` registers **`prodMigrations`** from `migrations/`. After **`DATABASE_URL`** points at Neon, run **once** (or after pulling new migrations):
+
+```bash
+npm run payload:migrate
+```
+
+Use the same `.env.local` as `npm run dev` so `DATABASE_URL` and `PAYLOAD_SECRET` load. Then open **`/admin`** again.
+
+If you see errors like **Failed query** mentioning **`users_sessions`** or **`column users.role does not exist`**, the Payload migrations have not been applied to this database yet—run the command above.
+
+**Quick fix (Neon SQL Editor)** if migrate won’t run: execute **`scripts/fix-payload-users-role.sql`** (adds enum + `users.role`). Prefer **`npm run payload:migrate`** so `payload_migrations` stays in sync.
+
+**Repair schema** (uses **`DATABASE_URL`** from `.env.local` — **no dev server**):
+
+```bash
+npm run repair:payload
+```
+
+**Optional — same repair over HTTP** (dev server must be running, same `INTERNAL_SERVICE_KEY` as `.env.local`):
+
+```bash
+npm run repair:payload:api
+```
+
+Or: `POST /api/admin/repair-payload-schema?key=<INTERNAL_SERVICE_KEY>` — same SQL as above.
+
+If **`repair:payload:api`** fails to connect, you’ll see **fetch failed** / **ECONNREFUSED** — start **`npm run dev`** or use **`npm run repair:payload`** (direct DB) instead.
+
+If **`repair:payload:api`** returns **HTTP 500**, check the **`npm run dev` terminal** for the stack trace (`DATABASE_URL`, SQL errors). Ensure **`INTERNAL_SERVICE_KEY`** matches when using the API route.
+
+---
+
+## 6. Optional: sync schema (Drizzle)
 
 If you use Drizzle and custom tables:
 
@@ -73,7 +109,7 @@ See `docs/SCHEMA_SETUP.md` for details.
 
 ---
 
-## 6. Session cookies and different URLs
+## 7. Session cookies and different URLs
 
 The app sets the session cookie for your host so login works. In development we use `domain: 'localhost'` so the same cookie works for `localhost:3000`, `localhost:3001`, etc. On **http://localhost** the auth route rewrites cookies (removes `Secure` and `__Secure-` prefix) so the browser will store and send them; otherwise you’d get a redirect loop (login → dashboard → logged out → login). In production (HTTPS), leave cookies as-is. Set `COOKIE_DOMAIN` (e.g. `.your-app.com`) only if you need cross-subdomain sessions; otherwise leave it unset.
 
@@ -102,3 +138,4 @@ This is normal browser behavior and not a bug in Neon Auth.
 - [ ] Neon Auth enabled; `NEON_AUTH_BASE_URL` and `NEON_AUTH_COOKIE_SECRET` set
 - [ ] Vercel: same three env vars added; redeploy done
 - [ ] Localhost: `.env.local` with same three vars; `npm run dev` works
+- [ ] **`npm run payload:migrate`** run against Neon so `/admin` (Payload) tables exist

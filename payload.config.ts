@@ -10,6 +10,7 @@ import { ExternalIntegrations } from './collections/ExternalIntegrations';
 import { ApiSources } from './collections/ApiSources';
 import { ExternalApiRuns } from './collections/ExternalApiRuns';
 import { SiteSettings } from './globals/SiteSettings';
+import { migrations } from './migrations';
 
 const databaseUrl = process.env.DATABASE_URL || process.env.DATABASE_URI;
 
@@ -141,6 +142,8 @@ export default buildConfig({
       connectionString: databaseUrl || 'postgresql://localhost:5432/payload',
     },
     push: false, // use migrations so admin works without interactive Drizzle prompt
+    /** Required: registers `migrations/*.ts` so `payload migrate` applies Payload schema to Neon. */
+    prodMigrations: migrations,
   }),
   sharp,
 });

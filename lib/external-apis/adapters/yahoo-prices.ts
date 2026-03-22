@@ -2,7 +2,6 @@ import YahooFinance from 'yahoo-finance2';
 import type { IExternalApiAdapter } from '../types';
 import { getOrCreateOilTypeId } from '../oil-dim';
 import { sql } from '@/lib/db';
-import { src_scraper_logs } from '@/lib/db/schema';
 
 export type YahooPricesAdapterMarket = {
   /** Oil type code (stored in `dim_oil_types.code`, also used for `name` if `oilTypeName` is omitted). */

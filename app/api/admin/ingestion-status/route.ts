@@ -4,6 +4,7 @@
  */
 import { NextResponse } from 'next/server';
 import { count, desc } from 'drizzle-orm';
+import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { getSessionForApi } from '@/lib/auth/session';
 import { isPayloadAdmin } from '@/lib/auth/payload-admin';
 import { db } from '@/lib/db';
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    async function countSafe<T extends typeof fact_prices>(table: T): Promise<number> {
+    async function countSafe(table: AnyPgTable): Promise<number> {
       try {
         const [r] = await db.select({ n: count() }).from(table);
         return Number(r?.n ?? 0);
