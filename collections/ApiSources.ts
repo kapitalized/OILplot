@@ -9,7 +9,8 @@ export const ApiSources: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     group: 'Admin',
-    description: 'External API sources. Configure each source; run manually or via cron-job.org.',
+    description:
+      'One row per data feed. Put secrets (EIA key, etc.) in server env — not here. EIA: set EIA_API_KEY in .env.local / Vercel. Yahoo Finance needs no API key.',
   },
   access: {
     read: ({ req: { user } }) => Boolean(user?.role === 'admin'),
@@ -25,7 +26,8 @@ export const ApiSources: CollectionConfig = {
       required: true,
       defaultValue: 'generic',
       admin: {
-        description: 'Adapter key (e.g. generic). Add new adapters in lib/external-apis/adapters.',
+        description:
+          'Exact key: yahoo-prices | eia-petroleum | generic. Oil: use yahoo-prices or eia-petroleum (see config examples below).',
       },
     },
     {
@@ -33,7 +35,8 @@ export const ApiSources: CollectionConfig = {
       type: 'json',
       required: true,
       admin: {
-        description: 'Adapter-specific config (e.g. { "url": "https://...", "method": "GET", "headers": {} }).',
+        description:
+          'JSON only — no API keys here. Examples: WTI from Yahoo: {"markets":[{"oilTypeCode":"WTI","oilTypeName":"WTI","yahooSymbol":"CL=F","marketLocation":"WTI"}],"lookbackDays":16}. WTI from EIA (needs EIA_API_KEY in env): {"marketLocation":"WTI EIA","oilTypeCode":"WTI","series":"RWTC","frequency":"daily"}.',
       },
     },
     { name: 'enabled', type: 'checkbox', defaultValue: true },

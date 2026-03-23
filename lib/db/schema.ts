@@ -471,6 +471,7 @@ export const fact_prices = pgTable('fact_prices', {
   price_id: integer('price_id').primaryKey(),
   oil_type_id: integer('oil_type_id').references(() => dim_oil_types.id),
   price_usd_per_bbl: decimal('price_usd_per_bbl'),
+  source: text('source'),
   market_location: text('market_location'),
   price_date: date('price_date').notNull(),
 });

@@ -23,6 +23,8 @@ export type EiaPetroleumAdapterConfig = {
   product?: string;
   duoarea?: string;
   frequency?: 'daily' | 'weekly';
+  /** Number of rows to request for backfill (max bounded server-side). */
+  length?: number;
 };
 
 const EIA_V2_BASE = 'https://api.eia.gov/v2/petroleum/pri/spt/data/';
@@ -40,7 +42,10 @@ function buildUrl(apiKey: string, c: EiaPetroleumAdapterConfig): string {
   }
   u.searchParams.append('sort[0][column]', 'period');
   u.searchParams.append('sort[0][direction]', 'desc');
-  u.searchParams.set('length', '10');
+  const requestedLength =
+    typeof c.length === 'number' && Number.isFinite(c.length) ? Math.floor(c.length) : 180;
+  const boundedLength = Math.min(Math.max(requestedLength, 1), 5000);
+  u.searchParams.set('length', String(boundedLength));
   return u.toString();
 }
 
@@ -117,8 +122,16 @@ export const eiaPetroleumAdapter: IExternalApiAdapter = {
         root?.response?.data ??
         (Array.isArray(root.data) ? root.data : []) ??
         [];
-      const first = rows.find((r) => parsePeriod(r) && parseValue(r) != null);
-      if (!first) {
+      const usableRows = rows
+        .map((r) => {
+          const priceDate = parsePeriod(r);
+          const close = parseValue(r);
+          if (!priceDate || close == null) return null;
+          return { priceDate, close };
+        })
+        .filter((r): r is { priceDate: string; close: number } => r != null);
+
+      if (usableRows.length === 0) {
         const err = 'EIA returned no usable rows; check product/duoarea facets in config.';
         await sql`
           INSERT INTO src_scraper_logs (scraper_name, rows_inserted, status, error_message, raw_response_json)
@@ -127,52 +140,50 @@ export const eiaPetroleumAdapter: IExternalApiAdapter = {
         return { status: 'error', errorMessage: err, rawResult: root };
       }
 
-      const priceDate = parsePeriod(first)!;
-      const close = parseValue(first)!;
-      const priceUsdPerBbl = close.toFixed(2);
-
       const oilTypeId = await getOrCreateOilTypeId({
         oilTypeCode: c.oilTypeCode,
         oilTypeName: c.oilTypeName,
       });
 
-      await sql`
-        DELETE FROM fact_prices
-        WHERE price_date = ${priceDate}
-          OR oil_type_id = ${oilTypeId}
-          OR market_location = ${c.marketLocation}
-      `;
+      for (const row of usableRows) {
+        await sql`
+          DELETE FROM fact_prices
+          WHERE oil_type_id = ${oilTypeId}
+            AND market_location = ${c.marketLocation}
+            AND price_date = ${row.priceDate}
+        `;
 
-      await sql`
-        INSERT INTO fact_prices (oil_type_id, price_usd_per_bbl, market_location, price_date)
-        VALUES (${oilTypeId}, ${priceUsdPerBbl}::numeric, ${c.marketLocation}, ${priceDate})
-      `;
+        await sql`
+          INSERT INTO fact_prices (oil_type_id, price_usd_per_bbl, source, market_location, price_date)
+          VALUES (${oilTypeId}, ${row.close.toFixed(2)}::numeric, 'eia', ${c.marketLocation}, ${row.priceDate})
+        `;
+      }
 
-      const extracted = {
+      const extracted = usableRows.map((row) => ({
         marketLocation: c.marketLocation,
         oilTypeCode: c.oilTypeCode,
-        price_date: priceDate,
-        close,
+        price_date: row.priceDate,
+        close: row.close,
         source: 'EIA',
         series: c.series ?? (c.product && c.duoarea ? undefined : 'RWTC'),
         product: c.product,
         duoarea: c.duoarea,
-      };
+      }));
 
       await sql`
         INSERT INTO src_scraper_logs (scraper_name, rows_inserted, status, error_message, raw_response_json)
         VALUES (
           ${scraperName},
-          1,
+          ${usableRows.length},
           'success',
           null,
-          ${JSON.stringify({ url: EIA_V2_BASE, extracted })}::jsonb
+          ${JSON.stringify({ url: EIA_V2_BASE, rowsFetched: rows.length, extracted })}::jsonb
         )
       `;
 
       return {
         status: 'success',
-        recordsFetched: 1,
+        recordsFetched: usableRows.length,
         rawResult: extracted,
       };
     } catch (e) {

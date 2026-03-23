@@ -47,6 +47,11 @@ export const PAGES: Record<string, PageMeta> = {
     description: `Terms of service for using ${BRAND.name} — acceptable use and legal terms.`,
     robots: 'index, follow',
   },
+  repository: {
+    title: 'Collected data',
+    description: `Spot prices and ingestion logs stored in ${BRAND.name}'s open repository.`,
+    robots: 'index, follow',
+  },
 };
 
 const DEFAULT_DESCRIPTION = BRAND.slogan;

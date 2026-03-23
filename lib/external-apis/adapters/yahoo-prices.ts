@@ -15,7 +15,7 @@ export type YahooPricesAdapterMarket = {
 
 export type YahooPricesAdapterConfig = {
   markets: YahooPricesAdapterMarket[];
-  /** How far back to look for the last daily close. */
+  /** How far back to look for daily closes. */
   lookbackDays?: number;
 };
 
@@ -26,22 +26,11 @@ function toISODate(dateLike: unknown): string {
   return s.slice(0, 10);
 }
 
-function getRegularMarketPrice(q: unknown): number | null {
-  if (q == null || typeof q !== 'object') return null;
-  const v = (q as { regularMarketPrice?: unknown }).regularMarketPrice;
+function getClosePrice(row: unknown): number | null {
+  if (row == null || typeof row !== 'object') return null;
+  const anyRow = row as { close?: unknown; adjClose?: unknown };
+  const v = typeof anyRow.close === 'number' ? anyRow.close : anyRow.adjClose;
   return typeof v === 'number' && Number.isFinite(v) ? v : null;
-}
-
-function getRegularMarketTime(q: unknown): Date | null {
-  if (q == null || typeof q !== 'object') return null;
-  const v = (q as { regularMarketTime?: unknown }).regularMarketTime;
-  if (v instanceof Date) return v;
-  // In case yahoo-finance2 returns timestamps as numbers, interpret small values as seconds.
-  if (typeof v === 'number' && Number.isFinite(v)) {
-    const ms = v < 1e12 ? v * 1000 : v;
-    return new Date(ms);
-  }
-  return null;
 }
 
 export const yahooPricesAdapter: IExternalApiAdapter = {
@@ -73,45 +62,47 @@ export const yahooPricesAdapter: IExternalApiAdapter = {
         close: number;
       }> = [];
 
-      // The current oil schema has uniqueness constraints that make it effectively "latest per date".
-      // For a clean insert, we delete any existing `fact_prices` row for the selected price_date.
       let rowsInserted = 0;
 
       for (const market of markets) {
         try {
-          // `historical()` can be flaky due to Yahoo response shape/nulls; `quote()` is usually more reliable for "latest".
-          const q = await yf.quote(market.yahooSymbol);
-          const closePrice = getRegularMarketPrice(q);
-          if (closePrice == null) continue;
-          const priceUsdPerBbl = closePrice.toFixed(2);
-          const priceDate = toISODate(getRegularMarketTime(q) ?? end);
-
-          if (!Number.isFinite(closePrice)) continue;
-
           const oilTypeId = await getOrCreateOilTypeId(market);
+          const candles = (await yf.historical(market.yahooSymbol, {
+            period1,
+            period2,
+            interval: '1d',
+          })) as unknown[];
 
-          // Ensure uniqueness constraints are satisfied for `price_date` / `market_location` in current schema.
-          await sql`
-            DELETE FROM fact_prices
-            WHERE price_date = ${priceDate}
-              OR oil_type_id = ${oilTypeId}
-              OR market_location = ${market.marketLocation}
-          `;
+          for (const row of candles) {
+            const closePrice = getClosePrice(row);
+            if (closePrice == null) continue;
+            const anyRow = row as { date?: unknown };
+            const priceDate = toISODate(anyRow.date ?? end);
+            const priceUsdPerBbl = closePrice.toFixed(2);
 
-          await sql`
-            INSERT INTO fact_prices (oil_type_id, price_usd_per_bbl, market_location, price_date)
-            VALUES (${oilTypeId}, ${priceUsdPerBbl}::numeric, ${market.marketLocation}, ${priceDate})
-          `;
+            // Keep historical rows; only replace exact same market/type/date row.
+            await sql`
+              DELETE FROM fact_prices
+              WHERE oil_type_id = ${oilTypeId}
+                AND market_location = ${market.marketLocation}
+                AND price_date = ${priceDate}
+            `;
 
-          results.push({
-            marketLocation: market.marketLocation,
-            yahooSymbol: market.yahooSymbol,
-            oilTypeCode: market.oilTypeCode,
-            price_date: priceDate,
-            close: closePrice,
-          });
+            await sql`
+              INSERT INTO fact_prices (oil_type_id, price_usd_per_bbl, source, market_location, price_date)
+              VALUES (${oilTypeId}, ${priceUsdPerBbl}::numeric, 'yahoo', ${market.marketLocation}, ${priceDate})
+            `;
 
-          rowsInserted += 1;
+            results.push({
+              marketLocation: market.marketLocation,
+              yahooSymbol: market.yahooSymbol,
+              oilTypeCode: market.oilTypeCode,
+              price_date: priceDate,
+              close: closePrice,
+            });
+
+            rowsInserted += 1;
+          }
         } catch {
           // Keep going if one market fails; the adapter should still succeed for other markets.
           continue;

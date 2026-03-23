@@ -46,6 +46,31 @@ function formatDate(s: string | null): string {
   }
 }
 
+/** Readable on Payload dark shell: cream surface + ink text */
+const apiTableWrap =
+  'overflow-x-auto rounded border border-oilplot-ink/20 bg-oilplot-cream text-oilplot-ink';
+const apiTableHead = 'border-b border-oilplot-ink/15 bg-oilplot-cream';
+const apiTh = 'p-2 text-left font-medium text-oilplot-ink';
+const apiTd = 'p-2 text-oilplot-ink';
+const apiTdMuted = 'p-2 text-oilplot-ink/70';
+
+async function fetchJson<T>(url: string, label: string): Promise<T> {
+  const r = await fetch(url, { credentials: 'include' });
+  if (r.ok) return r.json() as Promise<T>;
+  let detail = r.statusText;
+  try {
+    const j = (await r.json()) as { error?: string; message?: string; detail?: string };
+    detail = j.error ?? j.message ?? j.detail ?? JSON.stringify(j);
+  } catch {
+    try {
+      detail = await r.text();
+    } catch {
+      /* keep statusText */
+    }
+  }
+  throw new Error(`${label} (${r.status}): ${detail}`);
+}
+
 export function ExternalApisView() {
   const [sources, setSources] = useState<ApiSource[]>([]);
   const [runs, setRuns] = useState<ApiRun[]>([]);
@@ -63,12 +88,8 @@ export function ExternalApisView() {
     setError(null);
     setIngestionError(null);
     Promise.all([
-      fetch('/api/admin/external-apis/sources', { credentials: 'include' }).then((r) =>
-        r.ok ? r.json() : Promise.reject(new Error('Failed to load sources'))
-      ),
-      fetch('/api/admin/external-apis/runs?limit=30', { credentials: 'include' }).then((r) =>
-        r.ok ? r.json() : Promise.reject(new Error('Failed to load runs'))
-      ),
+      fetchJson<{ sources: ApiSource[] }>('/api/admin/external-apis/sources', 'Failed to load sources'),
+      fetchJson<{ runs: ApiRun[] }>('/api/admin/external-apis/runs?limit=30', 'Failed to load runs'),
     ])
       .then(([sRes, rRes]) => {
         setSources((sRes as { sources: ApiSource[] }).sources);
@@ -198,44 +219,44 @@ export function ExternalApisView() {
                 <strong>fact_production:</strong> {ingestion.counts.fact_production}
               </span>
             </div>
-            <div className="overflow-x-auto rounded border bg-white">
+            <div className={apiTableWrap}>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="p-2 text-left font-medium">Scraper</th>
-                    <th className="p-2 text-left font-medium">Run time</th>
-                    <th className="p-2 text-left font-medium">Status</th>
-                    <th className="p-2 text-left font-medium">Rows</th>
-                    <th className="p-2 text-left font-medium">Error</th>
+                  <tr className={apiTableHead}>
+                    <th className={apiTh}>Scraper</th>
+                    <th className={apiTh}>Run time</th>
+                    <th className={apiTh}>Status</th>
+                    <th className={apiTh}>Rows</th>
+                    <th className={apiTh}>Error</th>
                   </tr>
                 </thead>
                 <tbody>
                   {ingestion.scraper_logs.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-3 text-muted-foreground">
+                      <td colSpan={5} className={`${apiTdMuted} p-3`}>
                         No scraper logs yet. Run a source or cron job.
                       </td>
                     </tr>
                   ) : (
                     ingestion.scraper_logs.map((log) => (
-                      <tr key={log.log_id} className="border-b last:border-0">
-                        <td className="p-2 font-mono text-xs">{log.scraper_name ?? '—'}</td>
-                        <td className="p-2 text-muted-foreground">{formatDate(log.run_time)}</td>
-                        <td className="p-2">
+                      <tr key={log.log_id} className="border-b border-oilplot-ink/10 last:border-0">
+                        <td className={`${apiTd} font-mono text-xs`}>{log.scraper_name ?? '—'}</td>
+                        <td className={`${apiTdMuted}`}>{formatDate(log.run_time)}</td>
+                        <td className={apiTd}>
                           <span
                             className={
                               log.status === 'success'
-                                ? 'text-green-600'
+                                ? 'text-green-700'
                                 : log.status === 'error'
-                                  ? 'text-red-600'
+                                  ? 'text-red-700'
                                   : ''
                             }
                           >
                             {log.status ?? '—'}
                           </span>
                         </td>
-                        <td className="p-2">{log.rows_inserted ?? '—'}</td>
-                        <td className="max-w-[240px] truncate p-2 text-muted-foreground" title={log.error_message ?? ''}>
+                        <td className={apiTd}>{log.rows_inserted ?? '—'}</td>
+                        <td className={`max-w-[240px] truncate ${apiTdMuted}`} title={log.error_message ?? ''}>
                           {log.error_message ?? '—'}
                         </td>
                       </tr>
@@ -250,62 +271,69 @@ export function ExternalApisView() {
 
       <section>
         <h2 className="mb-2 text-lg font-semibold">Sources</h2>
-        <div className="overflow-x-auto rounded border">
+        <div className={apiTableWrap}>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="p-2 text-left font-medium">Name</th>
-                <th className="p-2 text-left font-medium">Adapter</th>
-                <th className="p-2 text-left font-medium">Enabled</th>
-                <th className="p-2 text-left font-medium">Health</th>
-                <th className="p-2 text-left font-medium">Last run</th>
-                <th className="p-2 text-left font-medium">Actions</th>
+              <tr className={apiTableHead}>
+                <th className={apiTh}>Name</th>
+                <th className={apiTh}>Adapter</th>
+                <th className={apiTh}>Enabled</th>
+                <th className={apiTh}>Health</th>
+                <th className={apiTh}>Last run</th>
+                <th className={apiTh}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {sources.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-4 text-center text-muted-foreground">
-                    No API sources. <Link href="/admin/collections/api-sources/create" className="font-medium text-blue-600 underline">Add new</Link> to pull data from an external API.
+                  <td colSpan={6} className={`${apiTdMuted} p-4 text-center`}>
+                    No API sources.{' '}
+                    <Link href="/admin/collections/api-sources/create" className="font-medium text-blue-700 underline">
+                      Add new
+                    </Link>{' '}
+                    to pull data from an external API.
                   </td>
                 </tr>
               ) : (
                 sources.map((s) => (
-                  <tr key={s.id} className="border-b last:border-0">
-                    <td className="p-2 font-medium">{s.name}</td>
-                    <td className="p-2 font-mono text-xs">{s.adapter}</td>
-                    <td className="p-2">{s.enabled ? 'Yes' : 'No'}</td>
-                    <td className="p-2">
+                  <tr key={s.id} className="border-b border-oilplot-ink/10 last:border-0">
+                    <td className={`${apiTd} font-medium`}>{s.name}</td>
+                    <td className={`${apiTd} font-mono text-xs`}>{s.adapter}</td>
+                    <td className={apiTd}>{s.enabled ? 'Yes' : 'No'}</td>
+                    <td className={apiTd}>
                       <button
                         type="button"
                         disabled={testingId !== null}
                         onClick={() => testHealth(s.id)}
-                        className="rounded border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-50"
+                        className="rounded border border-oilplot-ink/25 bg-white px-2 py-1 text-xs text-oilplot-ink hover:bg-oilplot-cream disabled:opacity-50"
                         title="Test connection and response"
                       >
                         {testingId === s.id ? 'Testing…' : 'Test'}
                       </button>
                       {healthResult[s.id] && (
-                        <span className={healthResult[s.id].ok ? 'ml-1 text-green-600' : 'ml-1 text-red-600'} title={healthResult[s.id].message}>
+                        <span
+                          className={healthResult[s.id].ok ? 'ml-1 text-green-700' : 'ml-1 text-red-700'}
+                          title={healthResult[s.id].message}
+                        >
                           {healthResult[s.id].ok ? '✓' : '✗'}
                         </span>
                       )}
                     </td>
-                    <td className="p-2 text-muted-foreground">{formatDate(s.lastRunAt)}</td>
-                    <td className="p-2">
+                    <td className={apiTdMuted}>{formatDate(s.lastRunAt)}</td>
+                    <td className={apiTd}>
                       <div className="flex flex-wrap gap-1">
                         <button
                           type="button"
                           disabled={!s.enabled || runningId !== null}
                           onClick={() => runNow(s.id)}
-                          className="rounded border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-50"
+                          className="rounded border border-oilplot-ink/25 bg-white px-2 py-1 text-xs text-oilplot-ink hover:bg-oilplot-cream disabled:opacity-50"
                         >
                           {runningId === s.id ? 'Running…' : 'Run now'}
                         </button>
                         <button
                           type="button"
                           onClick={() => copyCronUrl(s.id)}
-                          className="rounded border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-50"
+                          className="rounded border border-oilplot-ink/25 bg-white px-2 py-1 text-xs text-oilplot-ink hover:bg-oilplot-cream"
                           title="Copy cron URL"
                         >
                           {copiedId === s.id ? 'Copied' : 'Copy cron URL'}
@@ -322,44 +350,44 @@ export function ExternalApisView() {
 
       <section>
         <h2 className="mb-2 text-lg font-semibold">Recent runs</h2>
-        <div className="overflow-x-auto rounded border">
+        <div className={apiTableWrap}>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="p-2 text-left font-medium">Source</th>
-                <th className="p-2 text-left font-medium">Started</th>
-                <th className="p-2 text-left font-medium">Status</th>
-                <th className="p-2 text-left font-medium">Records</th>
-                <th className="p-2 text-left font-medium">Error</th>
+              <tr className={apiTableHead}>
+                <th className={apiTh}>Source</th>
+                <th className={apiTh}>Started</th>
+                <th className={apiTh}>Status</th>
+                <th className={apiTh}>Records</th>
+                <th className={apiTh}>Error</th>
               </tr>
             </thead>
             <tbody>
               {runs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                  <td colSpan={5} className={`${apiTdMuted} p-4 text-center`}>
                     No runs yet.
                   </td>
                 </tr>
               ) : (
                 runs.map((r) => (
-                  <tr key={r.id} className="border-b last:border-0">
-                    <td className="p-2">{r.sourceName ?? r.sourceId ?? '—'}</td>
-                    <td className="p-2 text-muted-foreground">{formatDate(r.startedAt)}</td>
-                    <td className="p-2">
+                  <tr key={r.id} className="border-b border-oilplot-ink/10 last:border-0">
+                    <td className={apiTd}>{r.sourceName ?? r.sourceId ?? '—'}</td>
+                    <td className={apiTdMuted}>{formatDate(r.startedAt)}</td>
+                    <td className={apiTd}>
                       <span
                         className={
                           r.status === 'success'
-                            ? 'text-green-600'
+                            ? 'text-green-700'
                             : r.status === 'error'
-                              ? 'text-red-600'
-                              : 'text-amber-600'
+                              ? 'text-red-700'
+                              : 'text-amber-700'
                         }
                       >
                         {r.status ?? '—'}
                       </span>
                     </td>
-                    <td className="p-2">{r.recordsFetched != null ? r.recordsFetched : '—'}</td>
-                    <td className="max-w-[200px] truncate p-2 text-muted-foreground" title={r.errorMessage ?? ''}>
+                    <td className={apiTd}>{r.recordsFetched != null ? r.recordsFetched : '—'}</td>
+                    <td className={`max-w-[200px] truncate ${apiTdMuted}`} title={r.errorMessage ?? ''}>
                       {r.errorMessage ?? '—'}
                     </td>
                   </tr>

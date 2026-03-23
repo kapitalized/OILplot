@@ -32,6 +32,9 @@ export default async function MarketingLayout({
           <Link href="/" className={navLink}>
             Home
           </Link>
+          <Link href="/repository" className={navLink}>
+            Data
+          </Link>
           <Link href="/features" className={navLink}>
             Features
           </Link>
@@ -75,6 +78,9 @@ export default async function MarketingLayout({
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] font-black uppercase tracking-[0.25em] text-oilplot-ink/60">
             <Link href="/about" className="hover:text-oilplot-coral transition-colors">
               About
+            </Link>
+            <Link href="/repository" className="hover:text-oilplot-coral transition-colors">
+              Data
             </Link>
             <Link href="/features" className="hover:text-oilplot-coral transition-colors">
               Features
