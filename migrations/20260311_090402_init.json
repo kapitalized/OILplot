@@ -1058,14 +1058,14 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "default": "'ConstructAI'"
+          "default": "'Oilplot'"
         },
         "title_template": {
           "name": "title_template",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false,
-          "default": "'%s | ConstructAI'"
+          "default": "'%s | Oilplot'"
         },
         "default_description": {
           "name": "default_description",

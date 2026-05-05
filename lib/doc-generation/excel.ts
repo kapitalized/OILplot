@@ -30,7 +30,7 @@ export async function generateExcel(
   input: { kind: 'report'; content: ReportContent } | { kind: 'simple'; content: SimpleDocContent }
 ): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'B2B Blueprint';
+  wb.creator = 'Oilplot';
   wb.created = new Date();
 
   if (input.kind === 'report') {

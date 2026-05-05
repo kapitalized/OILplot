@@ -95,8 +95,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   
   CREATE TABLE IF NOT EXISTS "site_settings" (
   	"id" serial PRIMARY KEY NOT NULL,
-  	"site_title" varchar DEFAULT 'ConstructAI' NOT NULL,
-  	"title_template" varchar DEFAULT '%s | ConstructAI',
+  	"site_title" varchar DEFAULT 'Oilplot' NOT NULL,
+  	"title_template" varchar DEFAULT '%s | Oilplot',
   	"default_description" varchar,
   	"default_o_g_image" varchar,
   	"updated_at" timestamp(3) with time zone,

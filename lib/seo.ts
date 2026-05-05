@@ -48,8 +48,8 @@ export const PAGES: Record<string, PageMeta> = {
     robots: 'index, follow',
   },
   repository: {
-    title: 'Collected data',
-    description: `Spot prices and ingestion logs stored in ${BRAND.name}'s open repository.`,
+    title: 'Data catalog',
+    description: `Browse stored oil spot prices, filters, and ingestion logs from ${BRAND.name}'s open repository.`,
     robots: 'index, follow',
   },
 };

@@ -86,6 +86,7 @@ export const yahooPricesAdapter: IExternalApiAdapter = {
               WHERE oil_type_id = ${oilTypeId}
                 AND market_location = ${market.marketLocation}
                 AND price_date = ${priceDate}
+                AND source = 'yahoo'
             `;
 
             await sql`

@@ -23,7 +23,7 @@ This blueprint creates a professional-grade B2B foundation. It uses Next.js for 
 ```
 
 export const BRAND = {
-  name: "ConstructAI",
+  name: "Oilplot",
   logo: "/logo.svg",
   colors: { primary: "#2563eb", secondary: "#64748b" },
   slogan: "Precision AI for Technical Industries"

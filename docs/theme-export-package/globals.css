@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Oilplot palette:
+ * Field #A5C2D0 · Cream #F2EBD4 · Ink #3E322D · Sunset accents.
+ */
+:root {
+  --oilplot-field: #a5c2d0;
+  --oilplot-cream: #f2ebd4;
+  --oilplot-ink: #3e322d;
+  --background: 198 32% 74%;
+  --foreground: 20 22% 21%;
+  --card: 42 45% 90%;
+  --card-foreground: 20 22% 21%;
+  --border: 20 22% 21%;
+  --muted: 198 28% 55%;
+  --muted-foreground: 20 22% 28%;
+  --primary: 4 87% 58%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 20 22% 21%;
+  --radius: 0.125rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 198 32% 74%;
+    --foreground: 20 22% 21%;
+    --card: 42 45% 90%;
+    --card-foreground: 20 22% 21%;
+    --border: 20 22% 21%;
+    --muted: 198 28% 55%;
+    --muted-foreground: 20 22% 28%;
+    --primary: 4 87% 58%;
+    --primary-foreground: 0 0% 100%;
+  }
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  @apply text-foreground antialiased;
+  background-color: var(--oilplot-field);
+  font-feature-settings: "liga" 1;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.oilplot-theme h1,
+.oilplot-theme h2,
+.oilplot-theme h3 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--oilplot-ink);
+}

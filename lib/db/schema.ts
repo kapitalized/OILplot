@@ -14,6 +14,9 @@ import {
   jsonb,
   decimal,
   boolean,
+  serial,
+  numeric,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 // ---- Neon Auth (managed by Neon). Do not modify via migrations. ----
@@ -454,6 +457,10 @@ export const dim_refineries = pgTable('dim_refineries', {
   type: text('type').notNull().default('Refinery'),
   gps_lat: decimal('gps_lat'),
   gps_long: decimal('gps_long'),
+  /** EIA cap1 `series` id (e.g. 8_NA_8D0_SCA_4); upsert key for regional capacity rows. */
+  eia_series_id: text('eia_series_id').unique(),
+  eia_duoarea: text('eia_duoarea'),
+  eia_report_year: integer('eia_report_year'),
 });
 
 export const dim_wells = pgTable('dim_wells', {
@@ -507,6 +514,36 @@ export const fact_shipments = pgTable('fact_shipments', {
   route_name: text('route_name'),
   status: text('status').default('Completed'),
 });
+
+/**
+ * EIA regional refinery inputs/outputs (wiup, inpt2, refp2). Not plant-level Form EIA-810.
+ * Upsert key: (eia_series_id, period).
+ */
+export const fact_eia_refining_ops = pgTable(
+  'fact_eia_refining_ops',
+  {
+    id: serial('id').primaryKey(),
+    eia_series_id: text('eia_series_id').notNull(),
+    period: text('period').notNull(),
+    route_id: text('route_id').notNull(),
+    frequency: text('frequency').notNull(),
+    duoarea: text('duoarea'),
+    area_name: text('area_name'),
+    product: text('product'),
+    product_name: text('product_name'),
+    process: text('process'),
+    process_name: text('process_name'),
+    value: numeric('value'),
+    units: text('units'),
+    series_description: text('series_description'),
+  },
+  (t) => ({
+    seriesPeriodUidx: uniqueIndex('fact_eia_refining_ops_series_period_uidx').on(
+      t.eia_series_id,
+      t.period,
+    ),
+  }),
+);
 
 export const fact_well_output = pgTable('fact_well_output', {
   output_id: integer('output_id').primaryKey(),

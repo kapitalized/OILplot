@@ -12,7 +12,7 @@ Payload is installed and the admin UI is at **`/admin`**.
 The dashboard will look empty until you add content. Do these in order:
 
 1. **Site Settings** (globals)  
-   In the sidebar, open **Site Settings**. Set **Site Title** (e.g. ConstructAI), **Title Template** (e.g. `%s | ConstructAI`), and optionally **Default Description** and **Default OG Image**. Save. These values are used for SEO and metadata across the site.
+   In the sidebar, open **Site Settings**. Set **Site Title** (e.g. Oilplot), **Title Template** (e.g. `%s | Oilplot`), and optionally **Default Description** and **Default OG Image**. Save. These values are used for SEO and metadata across the site.
 
 2. **Pages**  
    To create the default pages (About, Features, Pricing, Contact, Privacy Policy, Terms of Service) in one go, with the dev server running run: **`npm run seed:payload`**. Then refresh the admin **Pages** list.  

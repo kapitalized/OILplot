@@ -35,6 +35,9 @@ export default async function MarketingLayout({
           <Link href="/repository" className={navLink}>
             Data
           </Link>
+          <Link href="/visualise" className={navLink}>
+            Visualise
+          </Link>
           <Link href="/features" className={navLink}>
             Features
           </Link>
@@ -81,6 +84,9 @@ export default async function MarketingLayout({
             </Link>
             <Link href="/repository" className="hover:text-oilplot-coral transition-colors">
               Data
+            </Link>
+            <Link href="/visualise" className="hover:text-oilplot-coral transition-colors">
+              Visualise
             </Link>
             <Link href="/features" className="hover:text-oilplot-coral transition-colors">
               Features

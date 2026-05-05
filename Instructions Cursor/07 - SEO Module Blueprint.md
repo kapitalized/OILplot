@@ -13,7 +13,7 @@ This module provides a simple, CMS-driven way to manage SEO for the marketing si
 ### **A. Global: SiteSettings**
 
 * **Site Title:** Base name of the application.  
-* **Title Template:** (e.g., "%s | ConstructAI")  
+* **Title Template:** (e.g., "%s | Oilplot")  
 * **Default Description:** Fallback description.  
 * **Default OG Image:** Fallback image for social sharing.
 

@@ -44,7 +44,7 @@ This guide lists the mandatory manual actions required on external platforms. Th
 Copy these into your local .env.local and your Vercel/Supabase settings.
 
 \# BRANDING  
-NEXT\_PUBLIC\_APP\_NAME="ConstructAI"
+NEXT\_PUBLIC\_APP\_NAME="Oilplot"
 
 \# SUPABASE (Project Settings \-\> API)  
 NEXT\_PUBLIC\_SUPABASE\_URL="\[https://your-project-id.supabase.co\](https://your-project-id.supabase.co)"  

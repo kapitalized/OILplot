@@ -151,6 +151,7 @@ export const eiaPetroleumAdapter: IExternalApiAdapter = {
           WHERE oil_type_id = ${oilTypeId}
             AND market_location = ${c.marketLocation}
             AND price_date = ${row.priceDate}
+            AND source = 'eia'
         `;
 
         await sql`

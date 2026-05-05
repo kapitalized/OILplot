@@ -8,7 +8,13 @@ import type { AnyPgTable } from 'drizzle-orm/pg-core';
 import { getSessionForApi } from '@/lib/auth/session';
 import { isPayloadAdmin } from '@/lib/auth/payload-admin';
 import { db } from '@/lib/db';
-import { fact_prices, fact_shipments, fact_production, src_scraper_logs } from '@/lib/db/schema';
+import {
+  fact_eia_refining_ops,
+  fact_prices,
+  fact_shipments,
+  fact_production,
+  src_scraper_logs,
+} from '@/lib/db/schema';
 
 function safeIso(v: unknown): string | null {
   if (v == null) return null;
@@ -37,6 +43,7 @@ export async function GET(request: Request) {
       fact_prices: await countSafe(fact_prices),
       fact_shipments: await countSafe(fact_shipments),
       fact_production: await countSafe(fact_production),
+      fact_eia_refining_ops: await countSafe(fact_eia_refining_ops),
     };
 
     let logs: Array<{

@@ -42,6 +42,28 @@ const DEFAULT_SOURCES: Array<{
       frequency: 'daily',
     },
   },
+  {
+    name: 'EIA regional refinery capacity (cap1)',
+    adapter: 'eia-refinery-capacity',
+    enabled: false,
+    config: {
+      year: new Date().getFullYear(),
+      streamDay: false,
+    },
+  },
+  {
+    name: 'EIA refinery inputs & outputs (wiup/refp2)',
+    adapter: 'eia-refining-ops',
+    enabled: false,
+    config: {
+      weeksBack: 26,
+      monthsBack: 24,
+      grossInputWeekly: true,
+      netCrudeWeekly: true,
+      netProductionMonthly: true,
+      netInputMonthly: false,
+    },
+  },
 ];
 
 export async function seedOilApiSources(): Promise<SeedOilSourcesResult> {

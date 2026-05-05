@@ -493,7 +493,7 @@ export interface SiteSetting {
   id: number;
   siteTitle: string;
   /**
-   * e.g. %s | ConstructAI
+   * e.g. %s | Oilplot
    */
   titleTemplate?: string | null;
   /**

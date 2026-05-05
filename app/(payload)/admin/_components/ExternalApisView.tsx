@@ -11,6 +11,10 @@ interface ApiSource {
   cronJobId: string | null;
   lastRunAt: string | null;
   updatedAt: string | null;
+  /** One-line summary from server (length, lookbackDays, etc.) */
+  configSummary?: string;
+  /** Full Payload `config` JSON (edit in Payload — use Edit link) */
+  config?: unknown;
 }
 
 interface ApiRun {
@@ -25,7 +29,12 @@ interface ApiRun {
 }
 
 interface IngestionStatus {
-  counts: { fact_prices: number; fact_shipments: number; fact_production: number };
+  counts: {
+    fact_prices: number;
+    fact_shipments: number;
+    fact_production: number;
+    fact_eia_refining_ops: number;
+  };
   scraper_logs: Array<{
     log_id: number;
     scraper_name: string | null;
@@ -188,6 +197,16 @@ export function ExternalApisView() {
           </Link>
         </div>
       </div>
+      <div className="rounded-md border border-oilplot-ink/20 bg-oilplot-cream/90 px-4 py-3 text-sm text-oilplot-ink">
+        <p className="font-medium text-oilplot-ink">Run settings (adapter + JSON config)</p>
+        <p className="mt-1 text-oilplot-ink/85">
+          Each row below is a Payload <strong>API source</strong> document. Use{' '}
+          <strong>Edit</strong> to change <code className="rounded bg-white/80 px-1 font-mono text-xs">length</code>,{' '}
+          <code className="rounded bg-white/80 px-1 font-mono text-xs">lookbackDays</code>, symbols, etc. Saving in
+          Payload updates what the next run uses. Secrets stay in env (<code className="font-mono text-xs">EIA_API_KEY</code>
+          ), not in this JSON.
+        </p>
+      </div>
       <p className="text-sm text-muted-foreground">
         Configure sources in the collection above. Use &quot;Run now&quot; or schedule via{' '}
         <a href="https://console.cron-job.org/jobs" target="_blank" rel="noopener noreferrer" className="underline">
@@ -195,6 +214,13 @@ export function ExternalApisView() {
         </a>
         : call the Cron URL with <code className="rounded bg-muted px-1">Authorization: Bearer CRON_SECRET</code> or{' '}
         <code className="rounded bg-muted px-1">X-Cron-Secret: CRON_SECRET</code>.
+      </p>
+      <p className="text-sm text-muted-foreground">
+        <strong className="text-foreground">More history:</strong> edit the source in Payload and raise{' '}
+        <code className="rounded bg-muted px-1">lookbackDays</code> (Yahoo) or <code className="rounded bg-muted px-1">length</code>{' '}
+        (EIA, daily rows returned), then <strong>Run now</strong> again. If ingestion failed with{' '}
+        <code className="rounded bg-muted px-1">fact_prices_oil_type_id_key</code>, run{' '}
+        <code className="rounded bg-muted px-1">npm run migrate:fact-prices-time-series</code> once, then re-run.
       </p>
 
       <section className="rounded border border-gray-200 bg-muted/30 p-4">
@@ -217,6 +243,9 @@ export function ExternalApisView() {
               </span>
               <span>
                 <strong>fact_production:</strong> {ingestion.counts.fact_production}
+              </span>
+              <span>
+                <strong>fact_eia_refining_ops:</strong> {ingestion.counts.fact_eia_refining_ops}
               </span>
             </div>
             <div className={apiTableWrap}>
@@ -277,6 +306,7 @@ export function ExternalApisView() {
               <tr className={apiTableHead}>
                 <th className={apiTh}>Name</th>
                 <th className={apiTh}>Adapter</th>
+                <th className={apiTh}>Run settings</th>
                 <th className={apiTh}>Enabled</th>
                 <th className={apiTh}>Health</th>
                 <th className={apiTh}>Last run</th>
@@ -286,7 +316,7 @@ export function ExternalApisView() {
             <tbody>
               {sources.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={`${apiTdMuted} p-4 text-center`}>
+                  <td colSpan={7} className={`${apiTdMuted} p-4 text-center`}>
                     No API sources.{' '}
                     <Link href="/admin/collections/api-sources/create" className="font-medium text-blue-700 underline">
                       Add new
@@ -299,6 +329,26 @@ export function ExternalApisView() {
                   <tr key={s.id} className="border-b border-oilplot-ink/10 last:border-0">
                     <td className={`${apiTd} font-medium`}>{s.name}</td>
                     <td className={`${apiTd} font-mono text-xs`}>{s.adapter}</td>
+                    <td className={`${apiTd} max-w-[280px]`}>
+                      <p
+                        className="font-mono text-[11px] leading-snug text-oilplot-ink/90"
+                        title={(() => {
+                          try {
+                            return JSON.stringify(s.config ?? {}, null, 2);
+                          } catch {
+                            return '';
+                          }
+                        })()}
+                      >
+                        {s.configSummary ?? '—'}
+                      </p>
+                      <Link
+                        href={`/admin/collections/api-sources/${s.id}`}
+                        className="mt-1 inline-block font-medium text-blue-700 underline text-xs"
+                      >
+                        Edit in Payload →
+                      </Link>
+                    </td>
                     <td className={apiTd}>{s.enabled ? 'Yes' : 'No'}</td>
                     <td className={apiTd}>
                       <button
@@ -322,6 +372,12 @@ export function ExternalApisView() {
                     <td className={apiTdMuted}>{formatDate(s.lastRunAt)}</td>
                     <td className={apiTd}>
                       <div className="flex flex-wrap gap-1">
+                        <Link
+                          href={`/admin/collections/api-sources/${s.id}`}
+                          className="rounded border border-oilplot-ink/40 bg-white px-2 py-1 text-xs text-oilplot-ink hover:bg-oilplot-cream"
+                        >
+                          Edit
+                        </Link>
                         <button
                           type="button"
                           disabled={!s.enabled || runningId !== null}
@@ -336,7 +392,7 @@ export function ExternalApisView() {
                           className="rounded border border-oilplot-ink/25 bg-white px-2 py-1 text-xs text-oilplot-ink hover:bg-oilplot-cream"
                           title="Copy cron URL"
                         >
-                          {copiedId === s.id ? 'Copied' : 'Copy cron URL'}
+                          {copiedId === s.id ? 'Copied' : 'Cron URL'}
                         </button>
                       </div>
                     </td>

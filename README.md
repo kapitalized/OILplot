@@ -1,6 +1,6 @@
-# B2B Blueprint
+# Oilplot
 
-Next.js 15 (App Router) + Neon / Supabase + Drizzle + Payload. Follow the blueprint docs in **Instruction Cursor** (or parent folder).
+Next.js 15 (App Router) + Neon / Supabase + Drizzle + Payload. Follow the blueprint docs in **Instructions Cursor** (or parent folder).
 
 ## Quick start
 
